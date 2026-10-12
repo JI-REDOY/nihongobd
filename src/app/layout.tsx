@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_JP, Noto_Serif_Bengali } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/shared/ServiceWorkerRegister";
 import { ToastProvider } from "@/context/ToastContext";
+import { NotificationManager } from "@/components/notifications/NotificationManager";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,10 +55,11 @@ export default function RootLayout({
       className={`${inter.variable} ${notoSansJP.variable} ${notoSerifBengali.variable}`}
     >
       <body className="font-sans antialiased bg-white text-text-primary">
-        <ToastProvider>
-          <ServiceWorkerRegister />
-          {children}
-        </ToastProvider>
+          <ToastProvider>
+            <ServiceWorkerRegister />
+            <NotificationManager />
+            {children}
+          </ToastProvider>
       </body>
     </html>
   );

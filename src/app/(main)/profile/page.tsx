@@ -5,6 +5,7 @@ import { ProfileCard } from "@/components/profile/ProfileCard";
 import { ProgressChart } from "@/components/profile/ProgressChart";
 import { StreakCard } from "@/components/profile/StreakCard";
 import Link from "next/link";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 
 export default async function ProfilePage() {
   const session = await getSession();
@@ -38,6 +39,10 @@ export default async function ProfilePage() {
           {/* Streak Card */}
           <div className="mb-8">
             <StreakCard />
+          </div>
+
+          <div className="mb-8">
+            <NotificationSettings />
           </div>
 
           <div className="mb-8">
