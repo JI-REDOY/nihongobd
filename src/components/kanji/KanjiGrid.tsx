@@ -10,6 +10,8 @@ import { kanjiCategories } from "@/lib/data/n5/kanji";
 import type { KanjiItem } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 
+const ITEMS_PER_PAGE = 40;
+
 interface KanjiGridProps {
   level: Level;
 }
@@ -18,6 +20,7 @@ export function KanjiGrid({ level }: KanjiGridProps) {
   const { progress, loading, toggleKanji } = useProgress();
   const [selected, setSelected] = useState<KanjiItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("সব");
+  const [page, setPage] = useState(1);
 
   const data = getLevelData(level).kanji;
   const learned = progress?.[level]?.kanji.learned || [];
@@ -30,11 +33,20 @@ export function KanjiGrid({ level }: KanjiGridProps) {
     return data.filter((k) => k.category === activeCategory);
   }, [activeCategory, data]);
 
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const isSelectedLearned = selected ? learned.includes(selected.id) : false;
 
   async function handleToggle() {
     if (!selected) return;
     await toggleKanji(level, selected.id);
+  }
+
+  function changeCategory(cat: string) {
+    setActiveCategory(cat);
+    setPage(1);
   }
 
   if (total === 0) {
@@ -67,6 +79,7 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           </p>
         </div>
 
+        {/* Progress */}
         <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
@@ -84,9 +97,10 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           </div>
         </div>
 
+        {/* Categories */}
         <div className="flex flex-wrap gap-2 mb-6">
           <button
-            onClick={() => setActiveCategory("সব")}
+            onClick={() => changeCategory("সব")}
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
               activeCategory === "সব"
@@ -99,7 +113,7 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           {kanjiCategories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => changeCategory(cat)}
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
                 activeCategory === cat
@@ -112,23 +126,81 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           ))}
         </div>
 
+        {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
             {Array.from({ length: 24 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-xl bg-bg-alt animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-            {filtered.map((item) => (
-              <KanjiCard
-                key={item.id}
-                item={item}
-                isLearned={learned.includes(item.id)}
-                onClick={() => setSelected(item)}
+              <div
+                key={i}
+                className="aspect-square rounded-xl bg-bg-alt animate-pulse"
               />
             ))}
           </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-border">
+            <p className="text-5xl mb-4">📭</p>
+            <p className="text-text-secondary font-bangla">
+              এই category তে কোনো কাঞ্জি নেই
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+              {paginatedItems.map((item) => (
+                <KanjiCard
+                  key={item.id}
+                  item={item}
+                  isLearned={learned.includes(item.id)}
+                  onClick={() => setSelected(item)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-sm text-text-secondary font-bangla">
+                  দেখানো হচ্ছে {startIndex + 1}–
+                  {Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} /{" "}
+                  {filtered.length}
+                </p>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className={cn(
+                      "px-3 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
+                      page === 1
+                        ? "text-text-secondary/40 cursor-not-allowed"
+                        : "text-text-secondary hover:bg-bg-alt hover:text-jp-red"
+                    )}
+                  >
+                    ← আগের
+                  </button>
+
+                  <PageNumbers
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                  />
+
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className={cn(
+                      "px-3 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
+                      page === totalPages
+                        ? "text-text-secondary/40 cursor-not-allowed"
+                        : "text-text-secondary hover:bg-bg-alt hover:text-jp-red"
+                    )}
+                  >
+                    পরের →
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <p className="text-center mt-8 text-sm text-text-secondary font-bangla">
@@ -143,5 +215,59 @@ export function KanjiGrid({ level }: KanjiGridProps) {
         onToggleLearned={handleToggle}
       />
     </div>
+  );
+}
+
+// ===== Pagination Numbers =====
+function PageNumbers({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  const pages: (number | "...")[] = [];
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (currentPage > 3) pages.push("...");
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (currentPage < totalPages - 2) pages.push("...");
+    pages.push(totalPages);
+  }
+
+  return (
+    <>
+      {pages.map((p, i) => {
+        if (p === "...") {
+          return (
+            <span key={`dots-${i}`} className="px-2 text-text-secondary font-en">
+              …
+            </span>
+          );
+        }
+
+        return (
+          <button
+            key={p}
+            onClick={() => onPageChange(p)}
+            className={cn(
+              "w-9 h-9 rounded-lg text-sm font-medium transition-colors font-en",
+              currentPage === p
+                ? "bg-jp-red text-white"
+                : "text-text-secondary hover:bg-bg-alt hover:text-jp-red"
+            )}
+          >
+            {p}
+          </button>
+        );
+      })}
+    </>
   );
 }

@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 type ViewMode = "list" | "flashcard";
 type FilterMode = "all" | "learned" | "not-learned";
 
+const ITEMS_PER_PAGE = 30;
+
 interface VocabListProps {
   level: Level;
 }
@@ -21,6 +23,7 @@ export function VocabList({ level }: VocabListProps) {
   const [view, setView] = useState<ViewMode>("list");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [flashIndex, setFlashIndex] = useState(0);
+  const [page, setPage] = useState(1);
 
   const data = getLevelData(level).vocab;
   const learned = progress?.[level]?.vocabulary.learned || [];
@@ -34,6 +37,10 @@ export function VocabList({ level }: VocabListProps) {
     return data;
   }, [filter, learned, data]);
 
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const flashItem = filtered[flashIndex];
 
   async function handleToggle(id: string) {
@@ -46,6 +53,11 @@ export function VocabList({ level }: VocabListProps) {
 
   function handlePrev() {
     if (flashIndex > 0) setFlashIndex(flashIndex - 1);
+  }
+
+  function changeFilter(f: FilterMode) {
+    setFilter(f);
+    setPage(1);
   }
 
   if (total === 0) {
@@ -78,6 +90,7 @@ export function VocabList({ level }: VocabListProps) {
           </p>
         </div>
 
+        {/* Progress */}
         <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
@@ -95,6 +108,7 @@ export function VocabList({ level }: VocabListProps) {
           </div>
         </div>
 
+        {/* Controls */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <div className="inline-flex rounded-xl border border-border bg-white p-1">
             <button
@@ -135,7 +149,7 @@ export function VocabList({ level }: VocabListProps) {
               ).map(([key, label]) => (
                 <button
                   key={key}
-                  onClick={() => setFilter(key)}
+                  onClick={() => changeFilter(key)}
                   className={cn(
                     "px-3 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
                     filter === key
@@ -154,6 +168,7 @@ export function VocabList({ level }: VocabListProps) {
           </span>
         </div>
 
+        {/* Content */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -169,17 +184,67 @@ export function VocabList({ level }: VocabListProps) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.map((item) => (
-                <VocabCard
-                  key={item.id}
-                  item={item}
-                  isLearned={learned.includes(item.id)}
-                  onToggle={() => handleToggle(item.id)}
-                  onSpeak={() => speakJapanese(item.japanese)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {paginatedItems.map((item) => (
+                  <VocabCard
+                    key={item.id}
+                    item={item}
+                    isLearned={learned.includes(item.id)}
+                    onToggle={() => handleToggle(item.id)}
+                    onSpeak={() => speakJapanese(item.japanese)}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-sm text-text-secondary font-bangla">
+                    দেখানো হচ্ছে {startIndex + 1}–
+                    {Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} /{" "}
+                    {filtered.length}
+                  </p>
+
+                  <div className="flex items-center gap-1">
+                    {/* Prev */}
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className={cn(
+                        "px-3 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
+                        page === 1
+                          ? "text-text-secondary/40 cursor-not-allowed"
+                          : "text-text-secondary hover:bg-bg-alt hover:text-jp-red"
+                      )}
+                    >
+                      ← আগের
+                    </button>
+
+                    {/* Page numbers */}
+                    <PageNumbers
+                      currentPage={page}
+                      totalPages={totalPages}
+                      onPageChange={setPage}
+                    />
+
+                    {/* Next */}
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className={cn(
+                        "px-3 py-2 rounded-lg text-sm font-medium transition-colors font-bangla",
+                        page === totalPages
+                          ? "text-text-secondary/40 cursor-not-allowed"
+                          : "text-text-secondary hover:bg-bg-alt hover:text-jp-red"
+                      )}
+                    >
+                      পরের →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )
         ) : flashItem ? (
           <Flashcard
@@ -200,5 +265,67 @@ export function VocabList({ level }: VocabListProps) {
         )}
       </Container>
     </div>
+  );
+}
+
+// ===== Pagination Numbers =====
+function PageNumbers({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  const pages: (number | "...")[] = [];
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+
+    if (currentPage > 3) pages.push("...");
+
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    if (currentPage < totalPages - 2) pages.push("...");
+
+    pages.push(totalPages);
+  }
+
+  return (
+    <>
+      {pages.map((p, i) => {
+        if (p === "...") {
+          return (
+            <span
+              key={`dots-${i}`}
+              className="px-2 text-text-secondary font-en"
+            >
+              …
+            </span>
+          );
+        }
+
+        return (
+          <button
+            key={p}
+            onClick={() => onPageChange(p)}
+            className={cn(
+              "w-9 h-9 rounded-lg text-sm font-medium transition-colors font-en",
+              currentPage === p
+                ? "bg-jp-red text-white"
+                : "text-text-secondary hover:bg-bg-alt hover:text-jp-red"
+            )}
+          >
+            {p}
+          </button>
+        );
+      })}
+    </>
   );
 }
