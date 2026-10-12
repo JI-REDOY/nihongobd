@@ -85,6 +85,13 @@ export function UserMenu() {
               ব্যাজ
             </Link>
             <Link
+              href="/profile/quiz-history"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 text-sm hover:bg-bg-alt font-bangla"
+            >
+              কুইজ হিস্ট্রি
+            </Link>
+            <Link
               href="/profile"
               onClick={() => setOpen(false)}
               className="block px-4 py-2 text-sm hover:bg-bg-alt font-bangla"

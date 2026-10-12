@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { ProgressChart } from "@/components/profile/ProgressChart";
 import { StreakCard } from "@/components/profile/StreakCard";
+import Link from "next/link";
 
 export default async function ProfilePage() {
   const session = await getSession();
@@ -37,6 +38,25 @@ export default async function ProfilePage() {
           {/* Streak Card */}
           <div className="mb-8">
             <StreakCard />
+          </div>
+
+          <div className="mb-8">
+            <Link href="/profile/quiz-history">
+              <div className="bg-white rounded-2xl border border-border shadow-soft p-5 flex items-center gap-4 hover:shadow-card transition-all">
+                <div className="w-14 h-14 rounded-xl bg-bd-green/10 text-bd-green flex items-center justify-center text-2xl shrink-0">
+                  📊
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-text-primary font-bangla">
+                    কুইজ হিস্ট্রি
+                  </h3>
+                  <p className="text-xs text-text-secondary mt-0.5 font-bangla">
+                    তোমার সব কুইজের ফলাফল দেখো
+                  </p>
+                </div>
+                <span className="text-jp-red text-2xl">→</span>
+              </div>
+            </Link>
           </div>
 
           {/* Progress */}
