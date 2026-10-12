@@ -39,9 +39,9 @@ export function useProgress() {
       setProgress((p) =>
         p
           ? {
-              ...p,
-              [type]: { learned: data.learned, inProgress: data.inProgress },
-            }
+            ...p,
+            [type]: { learned: data.learned, inProgress: data.inProgress },
+          }
           : p
       );
       return data;
@@ -77,6 +77,20 @@ export function useProgress() {
     return data;
   }, []);
 
+  const toggleKanji = useCallback(async (id: string) => {
+    const res = await fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "toggleKanji", id }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    setProgress((p) =>
+      p ? { ...p, kanji: { learned: data.learned } } : p
+    );
+    return data;
+  }, []);
+
   const saveQuiz = useCallback(
     async (score: number, type: string) => {
       const res = await fetch("/api/progress", {
@@ -102,6 +116,7 @@ export function useProgress() {
     toggleKana,
     toggleVocab,
     toggleGrammar,
+    toggleKanji,
     saveQuiz,
   };
 }

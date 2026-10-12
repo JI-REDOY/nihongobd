@@ -40,21 +40,21 @@ export function SignUpForm() {
     }
 
     toast.success("সফল!", "তোমার অ্যাকাউন্ট তৈরি হয়েছে");
-    router.push("/dashboard");
+    router.push("/onboarding");
     router.refresh();
   }
 
   async function handleGoogle() {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: "/onboarding",
     });
   }
 
   async function handleGitHub() {
     await authClient.signIn.social({
       provider: "github",
-      callbackURL: "/dashboard",
+      callbackURL: "/onboarding",
     });
   }
 

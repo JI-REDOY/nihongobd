@@ -10,8 +10,9 @@ import { UserMenu } from "@/components/auth/UserMenu";
 const navLinks = [
   { href: "/hiragana", label: "হিরাগানা" },
   { href: "/katakana", label: "কাতাকানা" },
-  { href: "/n5/vocabulary", label: "ভোকাবুলারি" },
+  { href: "/n5/vocabulary", label: "ভোকাব" },
   { href: "/n5/grammar", label: "গ্রামার" },
+  { href: "/n5/kanji", label: "কাঞ্জি" },
   { href: "/n5/quiz", label: "কুইজ" },
   { href: "/n5/speaking", label: "স্পিকিং" },
 ];

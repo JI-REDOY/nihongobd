@@ -10,11 +10,28 @@ export function emptyProgress(userId: string): UserProgress {
     katakana: { learned: [], inProgress: [] },
     vocabulary: { learned: [] },
     grammar: { completed: [] },
+    kanji: { learned: [] },  // ← নতুন
     quiz: { attempts: [] },
     streak: { current: 0, longest: 0, lastDate: null },
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+}
+// ===== Kanji =====
+export async function toggleKanjiLearned(userId: string, id: string) {
+  const progress = await getProgress(userId);
+  const current = progress.kanji?.learned || [];
+  const isLearned = current.includes(id);
+
+  const learned = isLearned
+    ? current.filter((k) => k !== id)
+    : [...current, id];
+
+  await updateProgress(userId, {
+    kanji: { learned },
+  });
+
+  return { learned, isLearned: !isLearned };
 }
 
 export async function getProgress(userId: string): Promise<UserProgress> {

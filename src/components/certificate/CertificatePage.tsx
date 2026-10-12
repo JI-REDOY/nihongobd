@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
-import { CertificateView } from "./CertificateView";
 import { useToast } from "@/context/ToastContext";
+import { CertificateView } from "./CertificateView";
 
 interface CertData {
   certificate: {
@@ -16,6 +16,7 @@ interface CertData {
       katakana: number;
       vocabulary: number;
       grammar: number;
+      kanji: number;
       quizAverage: number;
     };
   } | null;
@@ -162,6 +163,11 @@ export function CertificatePage() {
                 <a href="/n5/grammar">
                   <Button variant="outline" size="sm" className="font-bangla">
                     গ্রামার
+                  </Button>
+                </a>
+                <a href="/n5/kanji">
+                  <Button variant="outline" size="sm" className="font-bangla">
+                    কাঞ্জি
                   </Button>
                 </a>
               </div>

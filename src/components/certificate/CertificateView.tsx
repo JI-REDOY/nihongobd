@@ -13,6 +13,7 @@ interface Certificate {
     katakana: number;
     vocabulary: number;
     grammar: number;
+    kanji: number;
     quizAverage: number;
   };
 }
@@ -82,16 +83,17 @@ export function CertificateView({ certificate }: CertificateViewProps) {
 
           <p className="text-sm text-text-secondary max-w-md mx-auto mb-8 font-bangla leading-relaxed">
             কে সফলভাবে NihongoBD এর সম্পূর্ণ N5 কোর্স সম্পন্ন করার জন্য। এই
-            শিক্ষার্থী হিরাগানা, কাতাকানা, ২০০টি শব্দ, ১৫টি গ্রামার পাঠ ও কুইজ
-            সম্পূর্ণ করেছেন।
+            শিক্ষার্থী হিরাগানা, কাতাকানা, ২০০টি শব্দ, ১৫টি গ্রামার পাঠ,
+            ১০০টি কাঞ্জি ও কুইজ সম্পূর্ণ করেছেন।
           </p>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8 max-w-3xl mx-auto">
             <StatBox label="হিরাগানা" value={certificate.stats.hiragana} total={46} />
             <StatBox label="কাতাকানা" value={certificate.stats.katakana} total={46} />
             <StatBox label="ভোকাব" value={certificate.stats.vocabulary} total={200} />
             <StatBox label="গ্রামার" value={certificate.stats.grammar} total={15} />
+            <StatBox label="কাঞ্জি" value={certificate.stats.kanji} total={100} />
             <StatBox label="কুইজ" value={certificate.stats.quizAverage} suffix="%" />
           </div>
 

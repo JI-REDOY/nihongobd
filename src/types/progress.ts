@@ -4,6 +4,7 @@ export type UserProgress = {
   katakana: { learned: string[]; inProgress: string[] };
   vocabulary: { learned: string[] };
   grammar: { completed: string[] };
+  kanji: { learned: string[] };  // ← নতুন
   quiz: { attempts: { score: number; date: Date; type: string }[] };
   streak: { current: number; longest: number; lastDate: Date | null };
   createdAt: Date;

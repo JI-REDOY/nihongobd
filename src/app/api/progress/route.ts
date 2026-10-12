@@ -6,6 +6,7 @@ import {
   toggleKanaLearned,
   toggleVocabLearned,
   toggleGrammarCompleted,
+  toggleKanjiLearned,
   saveQuizAttempt,
   updateStreak,
 } from "@/lib/progress";
@@ -57,6 +58,12 @@ export async function POST(req: NextRequest) {
         const { score, type } = body;
         const result = await saveQuizAttempt(session.user.id, score, type);
         return NextResponse.json({ attempts: result });
+      }
+
+      case "toggleKanji": {
+        const { id } = body;
+        const result = await toggleKanjiLearned(session.user.id, id);
+        return NextResponse.json(result);
       }
 
       default:
