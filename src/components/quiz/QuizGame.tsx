@@ -5,6 +5,8 @@ import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { QuizQuestionComponent } from "./QuizQuestion";
 import { QuizResult } from "./QuizResult";
+import { ListeningQuiz } from "./ListeningQuiz";
+import { ReadingQuiz } from "./ReadingQuiz";
 import { useProgress } from "@/hooks/useProgress";
 import {
   generateQuiz,
@@ -21,6 +23,8 @@ const QUIZ_TYPES: {
   { type: "vocab", label: "ভোকাবুলারি", icon: "語", desc: "জাপানিজ শব্দের অর্থ" },
   { type: "hiragana", label: "হিরাগানা", icon: "あ", desc: "রোমাজি মিলাও" },
   { type: "katakana", label: "কাতাকানা", icon: "ア", desc: "রোমাজি মিলাও" },
+  { type: "listening", label: "লিসেনিং", icon: "🎧", desc: "শুনে অর্থ বলো" },
+  { type: "reading", label: "রিডিং", icon: "📖", desc: "পড়ে উত্তর দাও" },
 ];
 
 const QUESTIONS_PER_QUIZ = 10;
@@ -36,8 +40,14 @@ export function QuizGame() {
   const [quizFinished, setQuizFinished] = useState(false);
 
   function startQuiz(type: QuizType) {
-    const q = generateQuiz(type, QUESTIONS_PER_QUIZ);
     setQuizType(type);
+
+    // Advanced modes handle separately
+    if (type === "listening" || type === "reading") {
+      return;
+    }
+
+    const q = generateQuiz(type, QUESTIONS_PER_QUIZ);
     setQuestions(q);
     setCurrentIndex(0);
     setScore(0);
@@ -78,6 +88,28 @@ export function QuizGame() {
     setQuizFinished(false);
   }
 
+  // ===== Advanced: Listening =====
+  if (quizType === "listening") {
+    return (
+      <div className="py-10">
+        <Container>
+          <ListeningQuiz onBack={goBack} />
+        </Container>
+      </div>
+    );
+  }
+
+  // ===== Advanced: Reading =====
+  if (quizType === "reading") {
+    return (
+      <div className="py-10">
+        <Container>
+          <ReadingQuiz onBack={goBack} />
+        </Container>
+      </div>
+    );
+  }
+
   // ===== Type selection screen =====
   if (!quizType) {
     return (
@@ -92,7 +124,7 @@ export function QuizGame() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
             {QUIZ_TYPES.map(({ type, label, icon, desc }) => (
               <button
                 key={type}

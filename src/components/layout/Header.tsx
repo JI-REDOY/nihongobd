@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/n5/vocabulary", label: "ভোকাবুলারি" },
   { href: "/n5/grammar", label: "গ্রামার" },
   { href: "/n5/quiz", label: "কুইজ" },
+  { href: "/n5/speaking", label: "স্পিকিং" },
 ];
 
 export function Header() {

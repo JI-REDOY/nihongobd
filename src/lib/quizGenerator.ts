@@ -10,7 +10,7 @@ export type QuizQuestion = {
   type: "vocab-jp-to-bn" | "kana-romaji";
 };
 
-export type QuizType = "vocab" | "hiragana" | "katakana";
+export type QuizType = "vocab" | "hiragana" | "katakana" | "listening" | "reading";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];

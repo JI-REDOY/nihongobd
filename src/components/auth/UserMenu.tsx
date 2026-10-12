@@ -84,6 +84,13 @@ export function UserMenu() {
             >
               প্রোফাইল
             </Link>
+            <Link
+              href="/certificate"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 text-sm hover:bg-bg-alt font-bangla"
+            >
+              সার্টিফিকেট
+            </Link>
             <button
               onClick={handleSignOut}
               className="w-full text-left px-4 py-2 text-sm text-error hover:bg-error/5 font-bangla"
