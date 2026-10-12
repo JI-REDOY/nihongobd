@@ -22,6 +22,7 @@ export function VocabList({ level }: VocabListProps) {
   const { progress, loading, toggleVocab } = useProgress();
   const [view, setView] = useState<ViewMode>("list");
   const [filter, setFilter] = useState<FilterMode>("all");
+  const [search, setSearch] = useState("");
   const [flashIndex, setFlashIndex] = useState(0);
   const [page, setPage] = useState(1);
 
@@ -32,10 +33,27 @@ export function VocabList({ level }: VocabListProps) {
   const percent = total > 0 ? Math.round((learnedCount / total) * 100) : 0;
 
   const filtered = useMemo(() => {
-    if (filter === "learned") return data.filter((v) => learned.includes(v.id));
-    if (filter === "not-learned") return data.filter((v) => !learned.includes(v.id));
-    return data;
-  }, [filter, learned, data]);
+    let result = data;
+
+    if (filter === "learned") {
+      result = result.filter((v) => learned.includes(v.id));
+    } else if (filter === "not-learned") {
+      result = result.filter((v) => !learned.includes(v.id));
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase().trim();
+      result = result.filter(
+        (v) =>
+          v.japanese.includes(q) ||
+          v.romaji.toLowerCase().includes(q) ||
+          v.bangla.includes(q) ||
+          v.english.toLowerCase().includes(q)
+      );
+    }
+
+    return result;
+  }, [filter, learned, data, search]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
@@ -60,6 +78,12 @@ export function VocabList({ level }: VocabListProps) {
     setPage(1);
   }
 
+  function handleSearch(value: string) {
+    setSearch(value);
+    setPage(1);
+    setFlashIndex(0);
+  }
+
   if (total === 0) {
     return (
       <div className="py-20">
@@ -81,6 +105,7 @@ export function VocabList({ level }: VocabListProps) {
   return (
     <div className="py-10">
       <Container>
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
             {level.toUpperCase()} ভোকাবুলারি
@@ -105,6 +130,31 @@ export function VocabList({ level }: VocabListProps) {
               className="h-full bg-jp-red transition-all duration-500"
               style={{ width: `${percent}%` }}
             />
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="mb-4">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
+              🔍
+            </span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="শব্দ খোঁজো (জাপানিজ, রোমাজি, বাংলা, ইংরেজি)..."
+              className="w-full pl-10 pr-10 py-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-jp-red focus:ring-2 focus:ring-jp-red/20 min-h-[44px] font-bangla"
+            />
+            {search && (
+              <button
+                onClick={() => handleSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-error"
+                aria-label="Clear"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
@@ -180,7 +230,9 @@ export function VocabList({ level }: VocabListProps) {
             <div className="text-center py-16 bg-white rounded-xl border border-border">
               <p className="text-5xl mb-4">📭</p>
               <p className="text-text-secondary font-bangla">
-                এই filter এ কোনো শব্দ নেই
+                {search
+                  ? `"${search}" এর জন্য কোনো শব্দ পাওয়া যায়নি`
+                  : "এই filter এ কোনো শব্দ নেই"}
               </p>
             </div>
           ) : (
@@ -207,7 +259,6 @@ export function VocabList({ level }: VocabListProps) {
                   </p>
 
                   <div className="flex items-center gap-1">
-                    {/* Prev */}
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
@@ -221,14 +272,12 @@ export function VocabList({ level }: VocabListProps) {
                       ← আগের
                     </button>
 
-                    {/* Page numbers */}
                     <PageNumbers
                       currentPage={page}
                       totalPages={totalPages}
                       onPageChange={setPage}
                     />
 
-                    {/* Next */}
                     <button
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
@@ -284,16 +333,11 @@ function PageNumbers({
     for (let i = 1; i <= totalPages; i++) pages.push(i);
   } else {
     pages.push(1);
-
     if (currentPage > 3) pages.push("...");
-
     const start = Math.max(2, currentPage - 1);
     const end = Math.min(totalPages - 1, currentPage + 1);
-
     for (let i = start; i <= end; i++) pages.push(i);
-
     if (currentPage < totalPages - 2) pages.push("...");
-
     pages.push(totalPages);
   }
 

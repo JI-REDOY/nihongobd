@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Container } from "@/components/layout/Container";
 import { LessonCard } from "./LessonCard";
 import { useProgress } from "@/hooks/useProgress";
@@ -16,6 +16,7 @@ interface GrammarListProps {
 export function GrammarList({ level }: GrammarListProps) {
   const { progress, loading } = useProgress();
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   const data = getLevelData(level).grammar;
   const completed = progress?.[level]?.grammar.completed || [];
@@ -23,9 +24,26 @@ export function GrammarList({ level }: GrammarListProps) {
   const completedCount = completed.length;
   const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
 
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const filtered = useMemo(() => {
+    if (!search.trim()) return data;
+    const q = search.toLowerCase().trim();
+    return data.filter(
+      (l) =>
+        l.title.toLowerCase().includes(q) ||
+        l.titleJp.includes(q) ||
+        l.pattern.includes(q) ||
+        l.explanation.includes(q)
+    );
+  }, [data, search]);
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const paginatedItems = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  function handleSearch(value: string) {
+    setSearch(value);
+    setPage(1);
+  }
 
   if (total === 0) {
     return (
@@ -48,6 +66,7 @@ export function GrammarList({ level }: GrammarListProps) {
   return (
     <div className="py-10">
       <Container>
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
             {level.toUpperCase()} গ্রামার
@@ -58,7 +77,7 @@ export function GrammarList({ level }: GrammarListProps) {
         </div>
 
         {/* Progress */}
-        <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-8">
+        <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
               তোমার অগ্রগতি
@@ -75,12 +94,44 @@ export function GrammarList({ level }: GrammarListProps) {
           </div>
         </div>
 
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
+              🔍
+            </span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Lesson খোঁজো (title, pattern, ব্যাখ্যা)..."
+              className="w-full pl-10 pr-10 py-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-jp-red focus:ring-2 focus:ring-jp-red/20 min-h-[44px] font-bangla"
+            />
+            {search && (
+              <button
+                onClick={() => handleSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-error"
+                aria-label="Clear"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Lessons */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-40 rounded-xl bg-bg-alt animate-pulse" />
             ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-border">
+            <p className="text-5xl mb-4">🔍</p>
+            <p className="text-text-secondary font-bangla">
+              &quot;{search}&quot; এর জন্য কোনো lesson পাওয়া যায়নি
+            </p>
           </div>
         ) : (
           <>
@@ -100,7 +151,8 @@ export function GrammarList({ level }: GrammarListProps) {
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-text-secondary font-bangla">
                   দেখানো হচ্ছে {startIndex + 1}–
-                  {Math.min(startIndex + ITEMS_PER_PAGE, total)} / {total}
+                  {Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} /{" "}
+                  {filtered.length}
                 </p>
 
                 <div className="flex items-center gap-1">
@@ -174,7 +226,10 @@ function PageNumbers({
       {pages.map((p, i) => {
         if (p === "...") {
           return (
-            <span key={`dots-${i}`} className="px-2 text-text-secondary font-en">
+            <span
+              key={`dots-${i}`}
+              className="px-2 text-text-secondary font-en"
+            >
               …
             </span>
           );

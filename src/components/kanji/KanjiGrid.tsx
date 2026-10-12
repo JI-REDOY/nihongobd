@@ -20,6 +20,7 @@ export function KanjiGrid({ level }: KanjiGridProps) {
   const { progress, loading, toggleKanji } = useProgress();
   const [selected, setSelected] = useState<KanjiItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("সব");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
   const data = getLevelData(level).kanji;
@@ -29,9 +30,26 @@ export function KanjiGrid({ level }: KanjiGridProps) {
   const percent = total > 0 ? Math.round((learnedCount / total) * 100) : 0;
 
   const filtered = useMemo(() => {
-    if (activeCategory === "সব") return data;
-    return data.filter((k) => k.category === activeCategory);
-  }, [activeCategory, data]);
+    let result = data;
+
+    if (activeCategory !== "সব") {
+      result = result.filter((k) => k.category === activeCategory);
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase().trim();
+      result = result.filter(
+        (k) =>
+          k.kanji.includes(q) ||
+          k.meaning.includes(q) ||
+          k.meaningEn.toLowerCase().includes(q) ||
+          k.onReading.includes(q) ||
+          k.kunReading.includes(q)
+      );
+    }
+
+    return result;
+  }, [activeCategory, data, search]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
@@ -46,6 +64,11 @@ export function KanjiGrid({ level }: KanjiGridProps) {
 
   function changeCategory(cat: string) {
     setActiveCategory(cat);
+    setPage(1);
+  }
+
+  function handleSearch(value: string) {
+    setSearch(value);
     setPage(1);
   }
 
@@ -70,6 +93,7 @@ export function KanjiGrid({ level }: KanjiGridProps) {
   return (
     <div className="py-10">
       <Container>
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
             {level.toUpperCase()} কাঞ্জি
@@ -94,6 +118,31 @@ export function KanjiGrid({ level }: KanjiGridProps) {
               className="h-full bg-jp-red transition-all duration-500"
               style={{ width: `${percent}%` }}
             />
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="mb-4">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
+              🔍
+            </span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="কাঞ্জি, অর্থ বা reading খোঁজো..."
+              className="w-full pl-10 pr-10 py-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-jp-red focus:ring-2 focus:ring-jp-red/20 min-h-[44px] font-bangla"
+            />
+            {search && (
+              <button
+                onClick={() => handleSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-error"
+                aria-label="Clear"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
@@ -138,9 +187,11 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-border">
-            <p className="text-5xl mb-4">📭</p>
+            <p className="text-5xl mb-4">🔍</p>
             <p className="text-text-secondary font-bangla">
-              এই category তে কোনো কাঞ্জি নেই
+              {search
+                ? `"${search}" এর জন্য কোনো কাঞ্জি পাওয়া যায়নি`
+                : "এই category তে কোনো কাঞ্জি নেই"}
             </p>
           </div>
         ) : (
@@ -247,7 +298,10 @@ function PageNumbers({
       {pages.map((p, i) => {
         if (p === "...") {
           return (
-            <span key={`dots-${i}`} className="px-2 text-text-secondary font-en">
+            <span
+              key={`dots-${i}`}
+              className="px-2 text-text-secondary font-en"
+            >
               …
             </span>
           );
