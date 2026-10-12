@@ -47,26 +47,50 @@
 
 ---
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Node.js 20+
-- MongoDB Atlas account
-- Google + GitHub OAuth credentials
+## 📊 Current Status (Phase 1 Complete)
 
-### Installation
+### ✅ Completed Features
+- Landing page + Trial preview
+- Sign up / Sign in (Email + Google + GitHub)
+- Onboarding (duration select — 30/60/90/180 days)
+- হিরাগানা (46) — grid + modal + audio + progress
+- কাতাকানা (46) — same structure
+- N5 Vocabulary (200) — flashcard + list + filter
+- N5 Grammar (15) — list + detail + mark complete
+- N5 Kanji (100) — grid + category filter + modal + readings
+- Quiz — 5 types (vocab, hiragana, katakana, listening, reading)
+- Speaking Practice (Web Speech API pronunciation check)
+- Dashboard — hero + progress tiles + streak + course countdown
+- Profile + Edit + Image upload (GridFS)
+- Certificate system (80% eligibility + print)
+- Toast notifications + Loading + 404
+- PWA (installable + offline + custom install button)
+- MongoDB Atlas + GridFS image storage
+- Vercel deployed: https://nihongobd.vercel.app
 
-```bash
-# Clone
-git clone https://github.com/YOUR_USERNAME/nihongobd.git
-cd nihongobd
+### 🚧 Next Phase Options
+- N5 polish (search, quiz history, dark mode, password reset)
+- N4 content (kanji + vocab + grammar + mock test)
+- Marketing + analytics
+- Payment (Stripe) + AI assistant
 
-# Install
-npm install
+### 🛠️ Tech Stack
+Next.js 16 · TypeScript · Tailwind CSS v4 · BetterAuth · 
+MongoDB Atlas · GridFS · Web Speech API · PWA · Vercel
 
-# Environment
-cp .env.example .env.local
-# Fill in all variables
+### 📁 Key Files
+- `src/lib/` — auth, mongodb, gridfs, progress, n5Vocab, n5Grammar, n5Kanji, kanaData, certificate, onboarding, quizGenerator, advancedQuiz
+- `src/app/(main)/` — protected routes (hiragana, katakana, n5/*, dashboard, profile, certificate, onboarding)
+- `src/components/` — layout, ui, kana, vocab, grammar, kanji, quiz, profile, dashboard, auth, pwa, onboarding, certificate, speaking
+- `src/hooks/` — useProgress, usePWAInstall, useServiceWorker
 
-# Dev server
-npm run dev
+---
+
+## 📝 Last Session Summary
+
+**Date:** 2026-10-12  
+**Completed:** Full N5 MVP with Kanji page + Onboarding + Certificate  
+**Deployed:** https://nihongobd.vercel.app  
+**Status:** Phase 1 Complete, ready for user feedback
