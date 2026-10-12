@@ -30,9 +30,9 @@ export function generateCertificateId(): string {
 export function calculateN5Completion(progress: UserProgress) {
     const hiragana = progress.hiragana.learned.length / 46;
     const katakana = progress.katakana.learned.length / 46;
-    const vocabulary = progress.vocabulary.learned.length / 200;
-    const grammar = progress.grammar.completed.length / 15;
-    const kanji = (progress.kanji?.learned?.length || 0) / 100;
+    const vocabulary = progress.n5.vocabulary.learned.length / 200;
+    const grammar = progress.n5.grammar.completed.length / 15;
+    const kanji = progress.n5.kanji.learned.length / 100;
 
     const total = (hiragana + katakana + vocabulary + grammar + kanji) / 5;
 
@@ -77,10 +77,10 @@ export async function issueCertificate(
         stats: {
             hiragana: progress.hiragana.learned.length,
             katakana: progress.katakana.learned.length,
-            vocabulary: progress.vocabulary.learned.length,
-            grammar: progress.grammar.completed.length,
+            vocabulary: progress.n5.vocabulary.learned.length,
+            grammar: progress.n5.grammar.completed.length,
             quizAverage: calculateQuizAverage(progress),
-            kanji: progress.kanji?.learned?.length || 0,
+            kanji: progress.n5.kanji.learned.length,
         },
     };
 

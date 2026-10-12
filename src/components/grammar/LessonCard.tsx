@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { GrammarLesson } from "@/lib/n5Grammar";
+import type { GrammarLesson } from "@/lib/data/types";
+import type { Level } from "@/lib/data";
 
 interface LessonCardProps {
   lesson: GrammarLesson;
+  level: Level;
   isCompleted: boolean;
 }
 
-export function LessonCard({ lesson, isCompleted }: LessonCardProps) {
+export function LessonCard({ lesson, level, isCompleted }: LessonCardProps) {
   return (
-    <Link href={`/n5/grammar/${lesson.id}`}>
+    <Link href={`/${level}/grammar/${lesson.id}`}>
       <div
         className={cn(
           "rounded-xl border p-5 transition-all duration-300 hover:shadow-soft hover:-translate-y-0.5 h-full",

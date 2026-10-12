@@ -1,5 +1,4 @@
-import { n5Vocab } from "./n5Vocab";
-import { hiraganaData, katakanaData } from "./kanaData";
+import { getLevelData, type Level } from "./data";
 
 export type QuizQuestion = {
   id: string;
@@ -41,12 +40,15 @@ function pickRandomUnique<T>(
   return result;
 }
 
-function makeVocabQuestions(count: number): QuizQuestion[] {
-  const selected = pickRandomUnique(n5Vocab, count, (v) => v.id);
+function makeVocabQuestions(count: number, level: Level): QuizQuestion[] {
+  const data = getLevelData(level).vocab;
+  if (data.length === 0) return [];
+
+  const selected = pickRandomUnique(data, count, (v) => v.id);
 
   return selected.map((vocab, idx) => {
     const wrong = pickRandomUnique(
-      n5Vocab.filter((v) => v.id !== vocab.id && v.bangla !== vocab.bangla),
+      data.filter((v) => v.id !== vocab.id && v.bangla !== vocab.bangla),
       3,
       (v) => v.bangla
     );
@@ -68,34 +70,38 @@ function makeKanaQuestions(
   type: "hiragana" | "katakana",
   count: number
 ): QuizQuestion[] {
+  // Kana data same as before
+  const { hiraganaData, katakanaData } = require("./kanaData");
   const data = type === "hiragana" ? hiraganaData : katakanaData;
 
-  const selected = pickRandomUnique(data, count, (k) => k.char);
+  const selected = pickRandomUnique(data, count, (k: any) => k.char);
 
-  return selected.map((kana, idx) => {
+  return selected.map((kana: any, idx: number) => {
     const wrong = pickRandomUnique(
-      data.filter((k) => k.char !== kana.char && k.romaji !== kana.romaji),
+      data.filter((k: any) => k.char !== kana.char && k.romaji !== kana.romaji),
       3,
-      (k) => k.romaji
+      (k: any) => k.romaji
     );
 
-    const options = shuffle([kana.romaji, ...wrong.map((w) => w.romaji)]);
+    const options = shuffle([kana.romaji, ...wrong.map((w: any) => w.romaji)]);
 
     return {
       id: `q-${idx}-${kana.char}`,
       question: kana.char,
       options,
       correctAnswer: kana.romaji,
-      type: "kana-romaji",
+      type: "kana-romaji" as const,
     };
   });
 }
 
 export function generateQuiz(
   type: QuizType,
-  count: number = 10
+  count: number = 10,
+  level: Level = "n5"
 ): QuizQuestion[] {
-  if (type === "vocab") return makeVocabQuestions(count);
+  if (type === "vocab") return makeVocabQuestions(count, level);
   if (type === "hiragana") return makeKanaQuestions("hiragana", count);
+  if (type === "katakana") return makeKanaQuestions("katakana", count);
   return makeKanaQuestions("katakana", count);
 }

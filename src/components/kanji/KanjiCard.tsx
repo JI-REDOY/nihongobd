@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { KanjiItem } from "@/lib/n5Kanji";
+import type { KanjiItem } from "@/lib/data/n5/kanji";
 
 interface KanjiCardProps {
   item: KanjiItem;

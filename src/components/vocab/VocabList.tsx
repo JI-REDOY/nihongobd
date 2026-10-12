@@ -6,34 +6,38 @@ import { VocabCard } from "./VocabCard";
 import { Flashcard } from "./Flashcard";
 import { useProgress } from "@/hooks/useProgress";
 import { speakJapanese } from "@/lib/audio";
-import { n5Vocab } from "@/lib/n5Vocab";
+import { getLevelData, type Level } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "list" | "flashcard";
 type FilterMode = "all" | "learned" | "not-learned";
 
-export function VocabList() {
+interface VocabListProps {
+  level: Level;
+}
+
+export function VocabList({ level }: VocabListProps) {
   const { progress, loading, toggleVocab } = useProgress();
   const [view, setView] = useState<ViewMode>("list");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [flashIndex, setFlashIndex] = useState(0);
 
-  const learned = progress?.vocabulary.learned || [];
-  const total = n5Vocab.length;
+  const data = getLevelData(level).vocab;
+  const learned = progress?.[level]?.vocabulary.learned || [];
+  const total = data.length;
   const learnedCount = learned.length;
-  const percent = Math.round((learnedCount / total) * 100);
+  const percent = total > 0 ? Math.round((learnedCount / total) * 100) : 0;
 
   const filtered = useMemo(() => {
-    if (filter === "learned") return n5Vocab.filter((v) => learned.includes(v.id));
-    if (filter === "not-learned") return n5Vocab.filter((v) => !learned.includes(v.id));
-    return n5Vocab;
-  }, [filter, learned]);
+    if (filter === "learned") return data.filter((v) => learned.includes(v.id));
+    if (filter === "not-learned") return data.filter((v) => !learned.includes(v.id));
+    return data;
+  }, [filter, learned, data]);
 
-  // Flashcard এর জন্য index safe রাখো
   const flashItem = filtered[flashIndex];
 
   async function handleToggle(id: string) {
-    await toggleVocab(id);
+    await toggleVocab(level, id);
   }
 
   function handleNext() {
@@ -44,20 +48,36 @@ export function VocabList() {
     if (flashIndex > 0) setFlashIndex(flashIndex - 1);
   }
 
+  if (total === 0) {
+    return (
+      <div className="py-20">
+        <Container>
+          <div className="text-center">
+            <p className="text-5xl mb-4">🚧</p>
+            <h2 className="text-2xl font-bold text-text-primary mb-2 font-bangla">
+              {level.toUpperCase()} ভোকাবুলারি শীঘ্রই আসছে
+            </h2>
+            <p className="text-text-secondary font-bangla">
+              এই level এর কন্টেন্ট এখনো তৈরি হচ্ছে
+            </p>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
   return (
     <div className="py-10">
       <Container>
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
-            N5 ভোকাবুলারি
+            {level.toUpperCase()} ভোকাবুলারি
           </h1>
           <p className="text-text-secondary font-bangla">
             {total}টি মৌলিক জাপানিজ শব্দ — বাংলা অর্থসহ
           </p>
         </div>
 
-        {/* Progress */}
         <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
@@ -75,9 +95,7 @@ export function VocabList() {
           </div>
         </div>
 
-        {/* Controls */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          {/* View toggle */}
           <div className="inline-flex rounded-xl border border-border bg-white p-1">
             <button
               onClick={() => setView("list")}
@@ -106,7 +124,6 @@ export function VocabList() {
             </button>
           </div>
 
-          {/* Filter (only in list view) */}
           {view === "list" && (
             <div className="inline-flex rounded-xl border border-border bg-white p-1">
               {(
@@ -132,20 +149,15 @@ export function VocabList() {
             </div>
           )}
 
-          {/* Count */}
           <span className="text-sm text-text-secondary ml-auto font-bangla">
             {filtered.length}টি শব্দ
           </span>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-48 rounded-xl bg-bg-alt animate-pulse"
-              />
+              <div key={i} className="h-48 rounded-xl bg-bg-alt animate-pulse" />
             ))}
           </div>
         ) : view === "list" ? (

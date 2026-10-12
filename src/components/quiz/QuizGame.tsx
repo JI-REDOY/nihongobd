@@ -13,6 +13,7 @@ import {
   type QuizQuestion,
   type QuizType,
 } from "@/lib/quizGenerator";
+import type { Level } from "@/lib/data";
 
 const QUIZ_TYPES: {
   type: QuizType;
@@ -29,7 +30,11 @@ const QUIZ_TYPES: {
 
 const QUESTIONS_PER_QUIZ = 10;
 
-export function QuizGame() {
+interface QuizGameProps {
+  level: Level;
+}
+
+export function QuizGame({ level }: QuizGameProps) {
   const { saveQuiz } = useProgress();
   const [quizType, setQuizType] = useState<QuizType | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -42,12 +47,11 @@ export function QuizGame() {
   function startQuiz(type: QuizType) {
     setQuizType(type);
 
-    // Advanced modes handle separately
     if (type === "listening" || type === "reading") {
       return;
     }
 
-    const q = generateQuiz(type, QUESTIONS_PER_QUIZ);
+    const q = generateQuiz(type, QUESTIONS_PER_QUIZ, level);
     setQuestions(q);
     setCurrentIndex(0);
     setScore(0);
@@ -88,29 +92,26 @@ export function QuizGame() {
     setQuizFinished(false);
   }
 
-  // ===== Advanced: Listening =====
   if (quizType === "listening") {
     return (
       <div className="py-10">
         <Container>
-          <ListeningQuiz onBack={goBack} />
+          <ListeningQuiz onBack={goBack} level={level} />
         </Container>
       </div>
     );
   }
 
-  // ===== Advanced: Reading =====
   if (quizType === "reading") {
     return (
       <div className="py-10">
         <Container>
-          <ReadingQuiz onBack={goBack} />
+          <ReadingQuiz onBack={goBack} level={level} />
         </Container>
       </div>
     );
   }
 
-  // ===== Type selection screen =====
   if (!quizType) {
     return (
       <div className="py-10">
@@ -148,7 +149,6 @@ export function QuizGame() {
     );
   }
 
-  // ===== Result screen =====
   if (quizFinished) {
     return (
       <div className="py-10">
@@ -164,7 +164,6 @@ export function QuizGame() {
     );
   }
 
-  // ===== Question screen =====
   const currentQ = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
@@ -172,7 +171,6 @@ export function QuizGame() {
     <div className="py-10">
       <Container>
         <div className="max-w-2xl mx-auto">
-          {/* Top bar */}
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={goBack}
@@ -188,7 +186,6 @@ export function QuizGame() {
             </span>
           </div>
 
-          {/* Progress bar */}
           <div className="w-full h-1.5 bg-bg-alt rounded-full overflow-hidden mb-8">
             <div
               className="h-full bg-jp-red transition-all duration-300"
@@ -196,7 +193,6 @@ export function QuizGame() {
             />
           </div>
 
-          {/* Question */}
           <QuizQuestionComponent
             question={currentQ}
             selectedAnswer={selectedAnswer}
@@ -204,7 +200,6 @@ export function QuizGame() {
             onSelect={handleSelect}
           />
 
-          {/* Next button */}
           {showResult && (
             <div className="mt-6 flex justify-end">
               <Button

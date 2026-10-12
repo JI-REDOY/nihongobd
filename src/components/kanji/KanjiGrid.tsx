@@ -5,45 +5,68 @@ import { Container } from "@/components/layout/Container";
 import { KanjiCard } from "./KanjiCard";
 import { KanjiModal } from "./KanjiModal";
 import { useProgress } from "@/hooks/useProgress";
-import { n5Kanji, kanjiCategories, type KanjiItem } from "@/lib/n5Kanji";
+import { getLevelData, type Level } from "@/lib/data";
+import { kanjiCategories } from "@/lib/data/n5/kanji";
+import type { KanjiItem } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 
-export function KanjiGrid() {
+interface KanjiGridProps {
+  level: Level;
+}
+
+export function KanjiGrid({ level }: KanjiGridProps) {
   const { progress, loading, toggleKanji } = useProgress();
   const [selected, setSelected] = useState<KanjiItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("সব");
 
-  const learned = progress?.kanji?.learned || [];
+  const data = getLevelData(level).kanji;
+  const learned = progress?.[level]?.kanji.learned || [];
   const learnedCount = learned.length;
-  const total = n5Kanji.length;
+  const total = data.length;
   const percent = total > 0 ? Math.round((learnedCount / total) * 100) : 0;
 
   const filtered = useMemo(() => {
-    if (activeCategory === "সব") return n5Kanji;
-    return n5Kanji.filter((k) => k.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === "সব") return data;
+    return data.filter((k) => k.category === activeCategory);
+  }, [activeCategory, data]);
 
   const isSelectedLearned = selected ? learned.includes(selected.id) : false;
 
   async function handleToggle() {
     if (!selected) return;
-    await toggleKanji(selected.id);
+    await toggleKanji(level, selected.id);
+  }
+
+  if (total === 0) {
+    return (
+      <div className="py-20">
+        <Container>
+          <div className="text-center">
+            <p className="text-5xl mb-4">🚧</p>
+            <h2 className="text-2xl font-bold text-text-primary mb-2 font-bangla">
+              {level.toUpperCase()} কাঞ্জি শীঘ্রই আসছে
+            </h2>
+            <p className="text-text-secondary font-bangla">
+              এই level এর কন্টেন্ট এখনো তৈরি হচ্ছে
+            </p>
+          </div>
+        </Container>
+      </div>
+    );
   }
 
   return (
     <div className="py-10">
       <Container>
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
-            N5 কাঞ্জি
+            {level.toUpperCase()} কাঞ্জি
           </h1>
           <p className="text-text-secondary font-bangla">
-            ১০০টি মৌলিক জাপানিজ কাঞ্জি — অর্থ, reading ও উদাহরণসহ
+            {total}টি কাঞ্জি — অর্থ, reading ও উদাহরণসহ
           </p>
         </div>
 
-        {/* Progress */}
         <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
@@ -61,7 +84,6 @@ export function KanjiGrid() {
           </div>
         </div>
 
-        {/* Category filter */}
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setActiveCategory("সব")}
@@ -90,14 +112,10 @@ export function KanjiGrid() {
           ))}
         </div>
 
-        {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
             {Array.from({ length: 24 }).map((_, i) => (
-              <div
-                key={i}
-                className="aspect-square rounded-xl bg-bg-alt animate-pulse"
-              />
+              <div key={i} className="aspect-square rounded-xl bg-bg-alt animate-pulse" />
             ))}
           </div>
         ) : (

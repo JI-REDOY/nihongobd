@@ -6,21 +6,28 @@ import { Button } from "@/components/ui/Button";
 import { useProgress } from "@/hooks/useProgress";
 import { speakJapanese } from "@/lib/audio";
 import { cn } from "@/lib/utils";
-import type { GrammarLesson } from "@/lib/n5Grammar";
+import type { GrammarLesson } from "@/lib/data/types";
+import type { Level } from "@/lib/data";
 
 interface GrammarDetailProps {
   lesson: GrammarLesson;
   prev: GrammarLesson | null;
   next: GrammarLesson | null;
+  level: Level;
 }
 
-export function GrammarDetail({ lesson, prev, next }: GrammarDetailProps) {
+export function GrammarDetail({
+  lesson,
+  prev,
+  next,
+  level,
+}: GrammarDetailProps) {
   const { progress, toggleGrammar } = useProgress();
-  const completed = progress?.grammar.completed || [];
+  const completed = progress?.[level]?.grammar.completed || [];
   const isCompleted = completed.includes(lesson.id);
 
   async function handleToggle() {
-    await toggleGrammar(lesson.id);
+    await toggleGrammar(level, lesson.id);
   }
 
   return (
@@ -30,7 +37,7 @@ export function GrammarDetail({ lesson, prev, next }: GrammarDetailProps) {
           {/* Breadcrumb */}
           <div className="mb-6">
             <Link
-              href="/n5/grammar"
+              href={`/${level}/grammar`}
               className="text-sm text-text-secondary hover:text-jp-red font-bangla"
             >
               ← সব পাঠ
@@ -125,8 +132,11 @@ export function GrammarDetail({ lesson, prev, next }: GrammarDetailProps) {
           {/* Navigation */}
           <div className="grid grid-cols-2 gap-3 mt-8">
             {prev ? (
-              <Link href={`/n5/grammar/${prev.id}`}>
-                <Button variant="outline" className="w-full justify-start font-bangla">
+              <Link href={`/${level}/grammar/${prev.id}`}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start font-bangla"
+                >
                   ← পাঠ {prev.number}
                 </Button>
               </Link>
@@ -134,8 +144,11 @@ export function GrammarDetail({ lesson, prev, next }: GrammarDetailProps) {
               <div />
             )}
             {next ? (
-              <Link href={`/n5/grammar/${next.id}`}>
-                <Button variant="outline" className="w-full justify-end font-bangla">
+              <Link href={`/${level}/grammar/${next.id}`}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-end font-bangla"
+                >
                   পাঠ {next.number} →
                 </Button>
               </Link>

@@ -7,12 +7,14 @@ import { generateListeningQuiz, type ListeningQuestion } from "@/lib/advancedQui
 import { QuizResult } from "./QuizResult";
 import { useProgress } from "@/hooks/useProgress";
 import { cn } from "@/lib/utils";
+import type { Level } from "@/lib/data";
 
 interface ListeningQuizProps {
   onBack: () => void;
+  level: Level;
 }
 
-export function ListeningQuiz({ onBack }: ListeningQuizProps) {
+export function ListeningQuiz({ onBack, level }: ListeningQuizProps) {
   const { saveQuiz } = useProgress();
   const [questions, setQuestions] = useState<ListeningQuestion[]>([]);
   const [current, setCurrent] = useState(0);
@@ -22,11 +24,12 @@ export function ListeningQuiz({ onBack }: ListeningQuizProps) {
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    const q = generateListeningQuiz(10);
+    const q = generateListeningQuiz(10, level);
     setQuestions(q);
-    // auto-play first
-    setTimeout(() => speakJapanese(q[0].audioText), 500);
-  }, []);
+    if (q.length > 0) {
+      setTimeout(() => speakJapanese(q[0].audioText), 500);
+    }
+  }, [level]);
 
   const currentQ = questions[current];
 
@@ -55,14 +58,14 @@ export function ListeningQuiz({ onBack }: ListeningQuizProps) {
   }
 
   function restart() {
-    const q = generateListeningQuiz(10);
+    const q = generateListeningQuiz(10, level);
     setQuestions(q);
     setCurrent(0);
     setSelected(null);
     setShowResult(false);
     setScore(0);
     setFinished(false);
-    setTimeout(() => speakJapanese(q[0].audioText), 500);
+    if (q.length > 0) setTimeout(() => speakJapanese(q[0].audioText), 500);
   }
 
   if (finished) {
@@ -79,7 +82,9 @@ export function ListeningQuiz({ onBack }: ListeningQuizProps) {
   if (!currentQ) {
     return (
       <div className="text-center py-20">
-        <p className="text-text-secondary font-bangla">লোড হচ্ছে...</p>
+        <p className="text-text-secondary font-bangla">
+          এই level এ এখনো কোনো শব্দ নেই
+        </p>
       </div>
     );
   }
@@ -113,7 +118,6 @@ export function ListeningQuiz({ onBack }: ListeningQuizProps) {
           যা শুনলে তার অর্থ কী?
         </p>
 
-        {/* Play button */}
         <button
           onClick={handleReplay}
           className="w-32 h-32 rounded-full bg-jp-red text-white flex items-center justify-center text-5xl hover:scale-105 transition-transform shadow-card mx-auto mb-4"

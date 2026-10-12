@@ -1,8 +1,9 @@
-import { n5Vocab } from "./n5Vocab";
+import { getLevelData, type Level } from "./data";
+import type { VocabItem } from "./data/types";
 
 export type ListeningQuestion = {
   id: string;
-  audioText: string; // যা speak হবে
+  audioText: string;
   options: string[];
   correctAnswer: string;
   questionLabel: string;
@@ -18,14 +19,18 @@ export type ReadingQuestion = {
   correctAnswer: string;
 };
 
-// ===== Listening Quiz =====
-// একটা জাপানিজ শব্দ speak হবে → user কে বাংলা অর্থ select করতে হবে
-export function generateListeningQuiz(count: number = 10): ListeningQuestion[] {
-  const shuffled = [...n5Vocab].sort(() => Math.random() - 0.5).slice(0, count);
+export function generateListeningQuiz(
+  count: number = 10,
+  level: Level = "n5"
+): ListeningQuestion[] {
+  const data = getLevelData(level).vocab;
+  if (data.length === 0) return [];
 
-  return shuffled.map((vocab, idx) => {
-    const wrong = [...n5Vocab]
-      .filter((v) => v.id !== vocab.id && v.bangla !== vocab.bangla)
+  const shuffled = [...data].sort(() => Math.random() - 0.5).slice(0, count);
+
+  return shuffled.map((vocab: VocabItem, idx: number) => {
+    const wrong = [...data]
+      .filter((v: VocabItem) => v.id !== vocab.id && v.bangla !== vocab.bangla)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3);
 
@@ -43,7 +48,6 @@ export function generateListeningQuiz(count: number = 10): ListeningQuestion[] {
   });
 }
 
-// ===== Reading Comprehension =====
 export type ReadingPassage = {
   id: string;
   japanese: string;

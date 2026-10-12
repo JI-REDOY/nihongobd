@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { speakJapanese } from "@/lib/audio";
-import type { VocabItem } from "@/lib/n5Vocab";
+import type { VocabItem } from "@/lib/data/n5/vocab";
 
 interface FlashcardProps {
   item: VocabItem;

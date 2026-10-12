@@ -41,14 +41,14 @@ export function ProgressChart() {
     },
     {
       label: "N5 ভোকাবুলারি",
-      learned: progress.vocabulary.learned.length,
+      learned: progress.n5.vocabulary.learned.length,
       total: 200,
       color: "jp-red",
       icon: "語",
     },
     {
       label: "N5 গ্রামার",
-      learned: progress.grammar.completed.length,
+      learned: progress.n5.grammar.completed.length,
       total: 15,
       color: "bd-green",
       icon: "文",

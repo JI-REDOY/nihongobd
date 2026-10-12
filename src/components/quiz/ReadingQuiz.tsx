@@ -7,12 +7,14 @@ import { generateReadingQuiz, type ReadingQuestion } from "@/lib/advancedQuiz";
 import { QuizResult } from "./QuizResult";
 import { useProgress } from "@/hooks/useProgress";
 import { cn } from "@/lib/utils";
+import type { Level } from "@/lib/data";
 
 interface ReadingQuizProps {
   onBack: () => void;
+  level: Level;
 }
 
-export function ReadingQuiz({ onBack }: ReadingQuizProps) {
+export function ReadingQuiz({ onBack, level }: ReadingQuizProps) {
   const { saveQuiz } = useProgress();
   const [questions, setQuestions] = useState<ReadingQuestion[]>([]);
   const [current, setCurrent] = useState(0);
@@ -24,7 +26,7 @@ export function ReadingQuiz({ onBack }: ReadingQuizProps) {
 
   useEffect(() => {
     setQuestions(generateReadingQuiz(5));
-  }, []);
+  }, [level]);
 
   const currentQ = questions[current];
 
@@ -100,7 +102,6 @@ export function ReadingQuiz({ onBack }: ReadingQuizProps) {
         />
       </div>
 
-      {/* Passage */}
       <div className="bg-white rounded-2xl border border-border shadow-soft p-6 mb-6">
         <div className="flex items-start justify-between gap-3 mb-3">
           <p className="text-2xl font-jp text-text-primary leading-relaxed flex-1">
@@ -133,7 +134,6 @@ export function ReadingQuiz({ onBack }: ReadingQuizProps) {
         )}
       </div>
 
-      {/* Question */}
       <div className="mb-4">
         <p className="text-sm font-medium text-text-primary mb-3 font-bangla">
           {currentQ.question}

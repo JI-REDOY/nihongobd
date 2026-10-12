@@ -3,7 +3,7 @@
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { speakJapanese } from "@/lib/audio";
-import type { KanjiItem } from "@/lib/n5Kanji";
+import type { KanjiItem } from "@/lib/data/n5/kanji";
 
 interface KanjiModalProps {
   item: KanjiItem | null;

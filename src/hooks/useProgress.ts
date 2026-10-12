@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { UserProgress } from "@/types/progress";
+import type { Level } from "@/lib/data/types";
 
 export function useProgress() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
@@ -37,76 +38,66 @@ export function useProgress() {
       if (!res.ok) return null;
       const data = await res.json();
       setProgress((p) =>
-        p
-          ? {
-            ...p,
-            [type]: { learned: data.learned, inProgress: data.inProgress },
-          }
-          : p
+        p ? { ...p, [type]: { learned: data.learned, inProgress: data.inProgress } } : p
       );
       return data;
     },
     []
   );
 
-  const toggleVocab = useCallback(async (id: string) => {
+  const toggleVocab = useCallback(async (level: Level, id: string) => {
     const res = await fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "toggleVocab", id }),
+      body: JSON.stringify({ action: "toggleVocab", level, id }),
     });
     if (!res.ok) return null;
     const data = await res.json();
     setProgress((p) =>
-      p ? { ...p, vocabulary: { learned: data.learned } } : p
+      p ? { ...p, [level]: { ...p[level], vocabulary: { learned: data.learned } } } : p
     );
     return data;
   }, []);
 
-  const toggleGrammar = useCallback(async (id: string) => {
+  const toggleGrammar = useCallback(async (level: Level, id: string) => {
     const res = await fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "toggleGrammar", id }),
+      body: JSON.stringify({ action: "toggleGrammar", level, id }),
     });
     if (!res.ok) return null;
     const data = await res.json();
     setProgress((p) =>
-      p ? { ...p, grammar: { completed: data.completed } } : p
+      p ? { ...p, [level]: { ...p[level], grammar: { completed: data.completed } } } : p
     );
     return data;
   }, []);
 
-  const toggleKanji = useCallback(async (id: string) => {
+  const toggleKanji = useCallback(async (level: Level, id: string) => {
     const res = await fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "toggleKanji", id }),
+      body: JSON.stringify({ action: "toggleKanji", level, id }),
     });
     if (!res.ok) return null;
     const data = await res.json();
     setProgress((p) =>
-      p ? { ...p, kanji: { learned: data.learned } } : p
+      p ? { ...p, [level]: { ...p[level], kanji: { learned: data.learned } } } : p
     );
     return data;
   }, []);
 
-  const saveQuiz = useCallback(
-    async (score: number, type: string) => {
-      const res = await fetch("/api/progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "saveQuiz", score, type }),
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      setProgress((p) =>
-        p ? { ...p, quiz: { attempts: data.attempts } } : p
-      );
-      return data;
-    },
-    []
-  );
+  const saveQuiz = useCallback(async (score: number, type: string) => {
+    const res = await fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "saveQuiz", score, type }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    setProgress((p) => (p ? { ...p, quiz: { attempts: data.attempts } } : p));
+    return data;
+  }, []);
 
   return {
     progress,
