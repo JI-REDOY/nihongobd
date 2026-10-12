@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { useProgress } from "@/hooks/useProgress";
 import { cn } from "@/lib/utils";
+import { BADGES, getEarnedBadges } from "@/lib/badges";
 
 interface DashboardClientProps {
     userName: string;
@@ -42,6 +43,7 @@ export function DashboardClient({
             </div>
         );
     }
+    const earnedBadges = progress ? getEarnedBadges(progress) : [];
 
     const items: ProgressItem[] = [
         {
@@ -212,6 +214,53 @@ export function DashboardClient({
                         <ProgressTile key={item.key} item={item} />
                     ))}
                 </div>
+            </div>
+
+            {/* Badges Preview */}
+            <div>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <span className="text-2xl">🏆</span>
+                        <h2 className="text-xl font-bold text-text-primary font-bangla">
+                            সাম্প্রতিক ব্যাজ
+                        </h2>
+                    </div>
+                    <Link
+                        href="/badges"
+                        className="text-sm text-jp-red hover:underline font-bangla"
+                    >
+                        সব দেখো →
+                    </Link>
+                </div>
+
+                {earnedBadges.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-border p-6 text-center">
+                        <p className="text-4xl mb-2">🔒</p>
+                        <p className="text-sm text-text-secondary font-bangla">
+                            এখনো কোনো ব্যাজ অর্জন করনি — শেখা শুরু করো!
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {earnedBadges.slice(0, 4).map((badge) => (
+                            <Link key={badge.id} href="/badges">
+                                <div
+                                    className={cn(
+                                        "rounded-xl p-4 text-center text-white shadow-soft hover:scale-[1.02] transition-transform",
+                                        badge.color === "jp-red"
+                                            ? "bg-gradient-to-br from-jp-red to-jp-red/80"
+                                            : badge.color === "bd-green"
+                                                ? "bg-gradient-to-br from-bd-green to-bd-green/80"
+                                                : "bg-gradient-to-br from-warning to-warning/80"
+                                    )}
+                                >
+                                    <div className="text-3xl mb-1 font-jp">{badge.icon}</div>
+                                    <p className="text-xs font-medium font-bangla">{badge.title}</p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Suggested Next + Quiz */}

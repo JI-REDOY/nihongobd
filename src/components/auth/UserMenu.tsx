@@ -78,6 +78,13 @@ export function UserMenu() {
               ড্যাশবোর্ড
             </Link>
             <Link
+              href="/badges"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 text-sm hover:bg-bg-alt font-bangla"
+            >
+              ব্যাজ
+            </Link>
+            <Link
               href="/profile"
               onClick={() => setOpen(false)}
               className="block px-4 py-2 text-sm hover:bg-bg-alt font-bangla"
