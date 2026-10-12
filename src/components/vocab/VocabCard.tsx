@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { VocabItem } from "@/lib/data/n5/vocab";
+import type { VocabItem } from "@/lib/data/types";
 
 interface VocabCardProps {
   item: VocabItem;
