@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
+import { LevelSwitcher } from "./LevelSwitcher";
 import { InstallButton } from "@/components/pwa/InstallButton";
 import { UserMenu } from "@/components/auth/UserMenu";
 
@@ -23,13 +24,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-border">
       <Container>
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
-          <Logo />
+          <div className="flex items-center gap-3">
+            <Logo />
+            <LevelSwitcher />
+          </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
+          <nav className="hidden lg:flex items-center gap-1">
+            {navLinks.slice(0, 5).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -48,7 +52,7 @@ export function Header() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg hover:bg-bg-alt"
+              className="lg:hidden w-11 h-11 flex items-center justify-center rounded-lg hover:bg-bg-alt"
               aria-label="Menu"
             >
               <span className="text-2xl">{isOpen ? "✕" : "☰"}</span>
@@ -58,7 +62,7 @@ export function Header() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <nav className="md:hidden py-4 border-t border-border flex flex-col gap-1">
+          <nav className="lg:hidden py-4 border-t border-border flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}

@@ -1,19 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { CertificateView } from "./CertificateView";
+import { cn } from "@/lib/utils";
 
 interface CertData {
   certificate: {
     certificateId: string;
     userName: string;
     issuedAt: string;
+    level: "n5" | "n4";
     stats: {
-      hiragana: number;
-      katakana: number;
+      hiragana?: number;
+      katakana?: number;
       vocabulary: number;
       grammar: number;
       kanji: number;
@@ -22,17 +25,25 @@ interface CertData {
   } | null;
   completion: number;
   eligible: boolean;
+  level: "n5" | "n4";
 }
 
 export function CertificatePage() {
   const toast = useToast();
+  const searchParams = useSearchParams();
+  const level = (searchParams.get("level") || "n5") as "n5" | "n4";
+
   const [data, setData] = useState<CertData | null>(null);
   const [loading, setLoading] = useState(true);
   const [issuing, setIssuing] = useState(false);
 
+  const isN5 = level === "n5";
+  const levelName = isN5 ? "N5" : "N4";
+
   async function load() {
+    setLoading(true);
     try {
-      const res = await fetch("/api/certificate");
+      const res = await fetch(`/api/certificate?level=${level}`);
       const d = await res.json();
       setData(d);
     } catch {
@@ -44,12 +55,16 @@ export function CertificatePage() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [level]);
 
   async function handleIssue() {
     setIssuing(true);
     try {
-      const res = await fetch("/api/certificate", { method: "POST" });
+      const res = await fetch("/api/certificate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level }),
+      });
       const d = await res.json();
       if (!res.ok) {
         toast.error("ব্যর্থ", d.error);
@@ -84,14 +99,43 @@ export function CertificatePage() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-8 text-center no-print">
             <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
-              🎓 N5 সার্টিফিকেট
+              🎓 {levelName} সার্টিফিকেট
             </h1>
             <p className="text-text-secondary font-bangla">
-              সম্পূর্ণ N5 কোর্স শেষ করে সার্টিফিকেট নাও
+              সম্পূর্ণ {levelName} কোর্স শেষ করে সার্টিফিকেট নাও
             </p>
+
+            {/* Level tabs */}
+            <div className="inline-flex rounded-xl border border-border bg-white p-1 mt-4">
+              <button
+                onClick={() => {
+                  window.location.href = "/certificate?level=n5";
+                }}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors font-en",
+                  isN5
+                    ? "bg-jp-red text-white"
+                    : "text-text-secondary hover:bg-bg-alt"
+                )}
+              >
+                N5
+              </button>
+              <button
+                onClick={() => {
+                  window.location.href = "/certificate?level=n4";
+                }}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors font-en",
+                  !isN5
+                    ? "bg-bd-green text-white"
+                    : "text-text-secondary hover:bg-bg-alt"
+                )}
+              >
+                N4
+              </button>
+            </div>
           </div>
 
-          {/* Certificate already exists */}
           {data.certificate ? (
             <CertificateView certificate={data.certificate} />
           ) : data.eligible ? (
@@ -101,7 +145,7 @@ export function CertificatePage() {
                 অভিনন্দন!
               </h2>
               <p className="text-text-secondary mb-6 font-bangla">
-                তুমি ৮০%+ সম্পন্ন করেছ। এখনই সার্টিফিকেট নাও!
+                তুমি {levelName} এর ৮০%+ সম্পন্ন করেছ। এখনই সার্টিফিকেট নাও!
               </p>
               <Button
                 variant="primary"
@@ -123,7 +167,6 @@ export function CertificatePage() {
                 সার্টিফিকেট পেতে কমপক্ষে ৮০% সম্পন্ন করো
               </p>
 
-              {/* Progress */}
               <div className="max-w-md mx-auto">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-text-secondary font-bangla">
@@ -135,7 +178,10 @@ export function CertificatePage() {
                 </div>
                 <div className="w-full h-3 bg-bg-alt rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-jp-red transition-all duration-700 rounded-full"
+                    className={cn(
+                      "h-full transition-all duration-700 rounded-full",
+                      isN5 ? "bg-jp-red" : "bg-bd-green"
+                    )}
                     style={{ width: `${data.completion}%` }}
                   />
                 </div>
@@ -145,27 +191,17 @@ export function CertificatePage() {
               </div>
 
               <div className="flex flex-wrap gap-2 justify-center mt-6 no-print">
-                <a href="/hiragana">
-                  <Button variant="outline" size="sm" className="font-bangla">
-                    হিরাগানা
-                  </Button>
-                </a>
-                <a href="/katakana">
-                  <Button variant="outline" size="sm" className="font-bangla">
-                    কাতাকানা
-                  </Button>
-                </a>
-                <a href="/n5/vocabulary">
+                <a href={`/${level}/vocabulary`}>
                   <Button variant="outline" size="sm" className="font-bangla">
                     ভোকাব
                   </Button>
                 </a>
-                <a href="/n5/grammar">
+                <a href={`/${level}/grammar`}>
                   <Button variant="outline" size="sm" className="font-bangla">
                     গ্রামার
                   </Button>
                 </a>
-                <a href="/n5/kanji">
+                <a href={`/${level}/kanji`}>
                   <Button variant="outline" size="sm" className="font-bangla">
                     কাঞ্জি
                   </Button>

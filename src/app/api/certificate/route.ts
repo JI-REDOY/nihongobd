@@ -1,39 +1,66 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getProgress } from "@/lib/progress";
 import {
-  getUserCertificate,
+  getUserCertificateByLevel,
   issueCertificate,
   isEligibleForCertificate,
+  isEligibleForN4Certificate,
   calculateN5Completion,
+  calculateN4Completion,
 } from "@/lib/certificate";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const cert = await getUserCertificate(session.user.id);
+  const url = new URL(req.url);
+  const level = (url.searchParams.get("level") || "n5") as "n5" | "n4";
+
+  if (level !== "n5" && level !== "n4") {
+    return NextResponse.json({ error: "Invalid level" }, { status: 400 });
+  }
+
+  const cert = await getUserCertificateByLevel(session.user.id, level);
   const progress = await getProgress(session.user.id);
 
-  return NextResponse.json({
-    certificate: cert,
-    completion: calculateN5Completion(progress),
-    eligible: isEligibleForCertificate(progress),
-  });
+  const completion =
+    level === "n5"
+      ? calculateN5Completion(progress)
+      : calculateN4Completion(progress);
+
+  const eligible =
+    level === "n5"
+      ? isEligibleForCertificate(progress)
+      : isEligibleForN4Certificate(progress);
+
+  return NextResponse.json({ certificate: cert, completion, eligible, level });
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const body = await req.json();
+  const level = (body.level || "n5") as "n5" | "n4";
+
+  if (level !== "n5" && level !== "n4") {
+    return NextResponse.json({ error: "Invalid level" }, { status: 400 });
+  }
+
   const progress = await getProgress(session.user.id);
 
-  if (!isEligibleForCertificate(progress)) {
+  const eligible =
+    level === "n5"
+      ? isEligibleForCertificate(progress)
+      : isEligibleForN4Certificate(progress);
+
+  if (!eligible) {
     return NextResponse.json(
       { error: "অসম্পূর্ণ — ৮০% এর বেশি সম্পন্ন করতে হবে" },
       { status: 400 }
@@ -43,7 +70,8 @@ export async function POST() {
   const cert = await issueCertificate(
     session.user.id,
     session.user.name || "শিক্ষার্থী",
-    progress
+    progress,
+    level
   );
 
   return NextResponse.json({ certificate: cert });

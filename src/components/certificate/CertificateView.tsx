@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
+import { cn } from "@/lib/utils";
 
 interface Certificate {
   certificateId: string;
   userName: string;
   issuedAt: string;
+  level?: "n5" | "n4";
   stats: {
-    hiragana: number;
-    katakana: number;
+    hiragana?: number;
+    katakana?: number;
     vocabulary: number;
     grammar: number;
     kanji: number;
@@ -24,7 +25,9 @@ interface CertificateViewProps {
 
 export function CertificateView({ certificate }: CertificateViewProps) {
   const toast = useToast();
-  const [downloading, setDownloading] = useState(false);
+  const level = certificate.level || "n5";
+  const isN5 = level === "n5";
+  const levelName = isN5 ? "N5" : "N4";
 
   function handlePrint() {
     window.print();
@@ -36,32 +39,44 @@ export function CertificateView({ certificate }: CertificateViewProps) {
     day: "numeric",
   });
 
+  // Border & accent color per level
+  const borderColor = isN5 ? "border-jp-red/20" : "border-bd-green/20";
+  const accentColor = isN5 ? "text-jp-red" : "text-bd-green";
+  const accentBg = isN5 ? "bg-jp-red" : "bg-bd-green";
+  const accentBorder = isN5 ? "border-jp-red/40" : "border-bd-green/40";
+
   return (
     <div>
       {/* Certificate */}
       <div
         id="certificate"
-        className="relative bg-white rounded-2xl border-4 border-jp-red/20 p-8 sm:p-12 shadow-card overflow-hidden"
+        className={cn(
+          "relative bg-white rounded-2xl border-4 p-8 sm:p-12 shadow-card overflow-hidden",
+          borderColor
+        )}
       >
         {/* Decorative corners */}
-        <div className="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 border-jp-red/40" />
-        <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 border-jp-red/40" />
-        <div className="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 border-jp-red/40" />
-        <div className="absolute bottom-4 right-4 w-16 h-16 border-b-2 border-r-2 border-jp-red/40" />
+        <div className={cn("absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2", accentBorder)} />
+        <div className={cn("absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2", accentBorder)} />
+        <div className={cn("absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2", accentBorder)} />
+        <div className={cn("absolute bottom-4 right-4 w-16 h-16 border-b-2 border-r-2", accentBorder)} />
 
         {/* Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-          <span className="text-[300px] font-jp font-bold text-jp-red">日</span>
+          <span className={cn("text-[300px] font-jp font-bold", accentColor)}>
+            日
+          </span>
         </div>
 
         <div className="relative text-center">
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-6">
-            <span className="w-10 h-10 rounded-lg bg-jp-red text-white flex items-center justify-center text-xl font-bold">
+            <span className={cn("w-10 h-10 rounded-lg text-white flex items-center justify-center text-xl font-bold", accentBg)}>
               日
             </span>
             <span className="text-xl font-bold">
-              Nihongo<span className="text-jp-red">BD</span>
+              Nihongo
+              <span className={accentColor}>BD</span>
             </span>
           </div>
 
@@ -70,31 +85,74 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           </p>
 
           <h1 className="text-2xl sm:text-3xl font-bold text-text-primary mb-6 font-bangla">
-            জাপানিজ ভাষা N5 সম্পূর্ণ
+            জাপানিজ ভাষা {levelName} সম্পূর্ণ
           </h1>
 
           <p className="text-sm text-text-secondary mb-3 font-bangla">
             এই সার্টিফিকেট প্রদান করা হলো
           </p>
 
-          <p className="text-3xl sm:text-4xl font-bold text-jp-red mb-6 font-bangla">
+          <p className={cn("text-3xl sm:text-4xl font-bold mb-6 font-bangla", accentColor)}>
             {certificate.userName}
           </p>
 
           <p className="text-sm text-text-secondary max-w-md mx-auto mb-8 font-bangla leading-relaxed">
-            কে সফলভাবে NihongoBD এর সম্পূর্ণ N5 কোর্স সম্পন্ন করার জন্য। এই
-            শিক্ষার্থী হিরাগানা, কাতাকানা, ২০০টি শব্দ, ১৫টি গ্রামার পাঠ,
-            ১০০টি কাঞ্জি ও কুইজ সম্পূর্ণ করেছেন।
+            কে সফলভাবে NihongoBD এর সম্পূর্ণ {levelName} কোর্স সম্পন্ন করার জন্য।
+            এই শিক্ষার্থী{" "}
+            {isN5
+              ? "হিরাগানা, কাতাকানা, ৮০০টি শব্দ, ৫০টি গ্রামার পাঠ, ১০০টি কাঞ্জি ও কুইজ সম্পূর্ণ করেছেন।"
+              : "১০০০টি শব্দ, ৮০টি গ্রামার পাঠ, ৩০০টি কাঞ্জি ও কুইজ সম্পূর্ণ করেছেন।"}
           </p>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8 max-w-3xl mx-auto">
-            <StatBox label="হিরাগানা" value={certificate.stats.hiragana} total={46} />
-            <StatBox label="কাতাকানা" value={certificate.stats.katakana} total={46} />
-            <StatBox label="ভোকাব" value={certificate.stats.vocabulary} total={200} />
-            <StatBox label="গ্রামার" value={certificate.stats.grammar} total={15} />
-            <StatBox label="কাঞ্জি" value={certificate.stats.kanji} total={100} />
-            <StatBox label="কুইজ" value={certificate.stats.quizAverage} suffix="%" />
+          <div
+            className={cn(
+              "grid gap-3 mb-8 max-w-3xl mx-auto",
+              isN5
+                ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-6"
+                : "grid-cols-2 sm:grid-cols-4"
+            )}
+          >
+            {isN5 && certificate.stats.hiragana !== undefined && (
+              <>
+                <StatBox
+                  label="হিরাগানা"
+                  value={certificate.stats.hiragana}
+                  total={46}
+                  accentColor={accentColor}
+                />
+                <StatBox
+                  label="কাতাকানা"
+                  value={certificate.stats.katakana || 0}
+                  total={46}
+                  accentColor={accentColor}
+                />
+              </>
+            )}
+            <StatBox
+              label="ভোকাব"
+              value={certificate.stats.vocabulary}
+              total={isN5 ? 800 : 1000}
+              accentColor={accentColor}
+            />
+            <StatBox
+              label="গ্রামার"
+              value={certificate.stats.grammar}
+              total={isN5 ? 50 : 80}
+              accentColor={accentColor}
+            />
+            <StatBox
+              label="কাঞ্জি"
+              value={certificate.stats.kanji}
+              total={isN5 ? 100 : 300}
+              accentColor={accentColor}
+            />
+            <StatBox
+              label="কুইজ"
+              value={certificate.stats.quizAverage}
+              suffix="%"
+              accentColor={accentColor}
+            />
           </div>
 
           {/* Footer */}
@@ -163,16 +221,18 @@ function StatBox({
   value,
   total,
   suffix,
+  accentColor,
 }: {
   label: string;
   value: number;
   total?: number;
   suffix?: string;
+  accentColor: string;
 }) {
   return (
     <div className="bg-bg-alt rounded-xl p-3">
       <p className="text-xs text-text-secondary font-bangla mb-1">{label}</p>
-      <p className="text-lg font-bold text-jp-red">
+      <p className={cn("text-lg font-bold", accentColor)}>
         {value}
         {total && <span className="text-xs text-text-secondary">/{total}</span>}
         {suffix}
