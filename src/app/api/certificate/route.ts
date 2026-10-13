@@ -37,7 +37,20 @@ export async function GET(req: NextRequest) {
       ? isEligibleForCertificate(progress)
       : isEligibleForN4Certificate(progress);
 
-  return NextResponse.json({ certificate: cert, completion, eligible, level });
+  // ⭐ Name, current session থেকে নাও (certificate এর পুরানো name এর বদলে)
+  const certWithCurrentName = cert
+    ? {
+        ...cert,
+        userName: session.user.name || "শিক্ষার্থী",
+      }
+    : null;
+
+  return NextResponse.json({
+    certificate: certWithCurrentName,
+    completion,
+    eligible,
+    level,
+  });
 }
 
 export async function POST(req: NextRequest) {

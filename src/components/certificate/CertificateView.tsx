@@ -353,7 +353,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
                 style={{ background: `${accent}40` }}
               />
               <span className="text-xs tracking-widest font-en uppercase text-text-secondary/60">
-                NihongoBD.com — Verified
+                NihongoBD.com
               </span>
               <div
                 className="w-12 h-px"

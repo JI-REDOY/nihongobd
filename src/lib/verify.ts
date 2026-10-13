@@ -1,4 +1,5 @@
 import { db } from "./mongodb";
+import { ObjectId } from "mongodb";
 
 const COLLECTION = "certificates";
 
@@ -37,11 +38,25 @@ export async function verifyCertificate(
       return { valid: false, reason: "এই সার্টিফিকেটটি খুঁজে পাওয়া যায়নি" };
     }
 
+    // ⭐ Current user এর name নাও (session থেকে না, DB এর user collection থেকে)
+    let currentName = cert.userName;
+    try {
+      const user = await db
+        .collection("user")
+        .findOne({ _id: new ObjectId(cert.userId) });
+      if (user && user.name) {
+        currentName = user.name;
+      }
+    } catch (err) {
+      // اگر user না পাওয়া যায়, certificate এর পুরানো name ব্যবহার করো
+      console.error("User lookup failed:", err);
+    }
+
     return {
       valid: true,
       certificate: {
         certificateId: cert.certificateId,
-        userName: cert.userName,
+        userName: currentName,
         level: cert.level,
         issuedAt: cert.issuedAt.toISOString(),
         stats: cert.stats,
