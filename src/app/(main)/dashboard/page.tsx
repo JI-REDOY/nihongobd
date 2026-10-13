@@ -9,6 +9,7 @@ export default async function DashboardPage() {
   if (!session) redirect("/signin?callbackUrl=/dashboard");
 
   const goal = await getCourseGoal(session.user.id);
+
   if (!goal) redirect("/onboarding");
 
   const user = session.user;
