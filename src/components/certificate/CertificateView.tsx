@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
@@ -45,7 +44,6 @@ export function CertificateView({ certificate }: CertificateViewProps) {
   const accent = isN5 ? "#BC002D" : "#006A4E";
   const accentDark = isN5 ? "#8E0021" : "#004A36";
 
-  // ⭐ Generate QR Code
   useEffect(() => {
     async function generateQR() {
       try {
@@ -54,10 +52,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
         const url = await QRCode.toDataURL(verifyUrl, {
           width: 200,
           margin: 1,
-          color: {
-            dark: "#000000",
-            light: "#FFFFFF",
-          },
+          color: { dark: "#000000", light: "#FFFFFF" },
           errorCorrectionLevel: "M",
         });
         setQrDataUrl(url);
@@ -70,28 +65,27 @@ export function CertificateView({ certificate }: CertificateViewProps) {
 
   return (
     <div>
+      {/* ===== CERTIFICATE ===== */}
       <div
         id="certificate"
-        className="relative bg-white overflow-hidden rounded-sm"
+        className="relative bg-white overflow-hidden"
         style={{
           boxShadow:
             "0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)",
         }}
       >
-        {/* ⭐ QR CODE — Top Right Corner */}
+        {/* QR CODE — Top Right */}
         {qrDataUrl && (
-          <div className="absolute top-6 right-6 sm:top-10 sm:right-10 z-10">
+          <div className="absolute top-6 right-6 sm:top-10 sm:right-10 z-10 print:top-4 print:right-4">
             <div
               className="bg-white p-2 rounded-lg border-2"
               style={{ borderColor: `${accent}30` }}
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={qrDataUrl}
                 alt="Verify QR Code"
-                width={72}
-                height={72}
-                className="w-16 h-16 sm:w-20 sm:h-20"
-                unoptimized
+                className="w-16 h-16 sm:w-20 sm:h-20 print:w-14 print:h-14"
               />
             </div>
             <p
@@ -103,7 +97,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           </div>
         )}
 
-        {/* Outer border */}
+        {/* Outer borders */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ border: `3px solid ${accent}` }}
@@ -168,25 +162,24 @@ export function CertificateView({ certificate }: CertificateViewProps) {
         />
 
         {/* Content */}
-        <div className="relative p-8 sm:p-14 lg:p-16">
+        <div className="relative px-8 py-10 sm:px-14 sm:py-16 lg:px-16 lg:py-20">
           {/* Header */}
-          <div className="flex flex-col items-center mb-10">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-white shadow-sm">
-                <Image
+          <div className="flex flex-col items-center mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-white shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src="/logo.png"
                   alt="NihongoBD"
-                  width={48}
-                  height={48}
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-2xl font-bold text-text-primary">
+              <span className="text-xl font-bold text-text-primary">
                 Nihongo<span style={{ color: accent }}>BD</span>
               </span>
             </div>
             <div
-              className="h-0.5 w-24 my-2"
+              className="h-0.5 w-24 my-1"
               style={{
                 background: `linear-gradient(to right, transparent, ${accent}, transparent)`,
               }}
@@ -194,9 +187,9 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           </div>
 
           {/* Title */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-6">
             <p
-              className="text-xs font-semibold uppercase tracking-[0.3em] mb-3 font-en"
+              className="text-xs font-semibold uppercase tracking-[0.3em] mb-2 font-en"
               style={{ color: accent }}
             >
               Certificate of Completion
@@ -214,13 +207,13 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           </div>
 
           {/* Award text */}
-          <div className="text-center mb-6">
-            <p className="text-sm text-text-secondary font-bangla mb-4">
+          <div className="text-center mb-4">
+            <p className="text-sm text-text-secondary font-bangla mb-3">
               এই সার্টিফিকেট গর্বের সাথে প্রদান করা হলো
             </p>
-            <div className="relative inline-block mb-4">
+            <div className="relative inline-block mb-3">
               <p
-                className="text-4xl sm:text-5xl font-bold font-bangla px-8 py-3 relative z-10"
+                className="text-4xl sm:text-5xl font-bold font-bangla px-8 py-2 relative z-10"
                 style={{ color: accent }}
               >
                 {certificate.userName}
@@ -245,7 +238,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           {/* Stats */}
           <div
             className={cn(
-              "grid gap-3 my-10 max-w-3xl mx-auto",
+              "grid gap-3 my-8 max-w-3xl mx-auto",
               isN5
                 ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-6"
                 : "grid-cols-2 sm:grid-cols-4"
@@ -294,7 +287,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           </div>
 
           {/* Footer */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end pt-8 mt-8 border-t border-border max-w-3xl mx-auto">
+          <div className="grid grid-cols-3 gap-6 items-end pt-6 mt-6 border-t border-border max-w-3xl mx-auto">
             {/* Date */}
             <div className="text-center">
               <p
@@ -304,7 +297,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
                 {issuedDate}
               </p>
               <div
-                className="w-full h-0.5 my-2"
+                className="w-full h-0.5 my-1"
                 style={{ background: `${accent}40` }}
               />
               <p className="text-xs text-text-secondary font-bangla uppercase tracking-wider">
@@ -313,19 +306,17 @@ export function CertificateView({ certificate }: CertificateViewProps) {
             </div>
 
             {/* Founder Signature */}
-            <div className="flex flex-col items-center order-first sm:order-none">
-              <div className="relative w-40 h-16 flex items-end justify-center">
-                <Image
+            <div className="flex flex-col items-center">
+              <div className="relative w-36 h-14 flex items-end justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src="/signature.png"
                   alt="Founder Signature"
-                  width={160}
-                  height={64}
                   className="w-full h-full object-contain"
-                  priority={false}
                 />
               </div>
               <div
-                className="w-32 h-0.5 my-2"
+                className="w-32 h-0.5 my-1"
                 style={{ background: `${accent}40` }}
               />
               <p className="text-xs text-text-secondary font-bangla uppercase tracking-wider">
@@ -345,7 +336,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
                 {certificate.certificateId}
               </p>
               <div
-                className="w-full h-0.5 my-2"
+                className="w-full h-0.5 my-1"
                 style={{ background: `${accent}40` }}
               />
               <p className="text-xs text-text-secondary font-bangla uppercase tracking-wider">
@@ -355,7 +346,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           </div>
 
           {/* Bottom flourish */}
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-center mt-6">
             <div className="flex items-center gap-3">
               <div
                 className="w-12 h-px"
@@ -373,7 +364,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
         </div>
       </div>
 
-      {/* Actions */}
+      {/* ===== ACTIONS ===== */}
       <div className="mt-8 flex flex-col sm:flex-row gap-3 no-print">
         <Button
           variant="primary"
@@ -406,18 +397,96 @@ export function CertificateView({ certificate }: CertificateViewProps) {
         </Button>
       </div>
 
+      {/* ===== PRINT STYLES ===== */}
       <style jsx global>{`
         @media print {
+          /* Hide everything except certificate */
           header,
           footer,
+          nav,
           .no-print {
             display: none !important;
           }
-          #certificate {
-            box-shadow: none !important;
-          }
+
+          /* Reset page */
+          html,
           body {
             background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+          }
+
+          /* Force colors */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+
+          /* A4 page — minimal margin */
+          @page {
+            size: A4 portrait;
+            margin: 4mm;
+          }
+
+          /* Certificate = single page */
+          #certificate {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            page-break-before: avoid !important;
+            overflow: hidden !important;
+          }
+
+          /* No page breaks inside */
+          #certificate,
+          #certificate * {
+            page-break-inside: avoid !important;
+            page-break-before: avoid !important;
+            page-break-after: avoid !important;
+          }
+
+          /* Compact all typography */
+          #certificate h1 {
+            font-size: 22px !important;
+            line-height: 1.2 !important;
+            margin-bottom: 4px !important;
+          }
+
+          #certificate p {
+            line-height: 1.35 !important;
+          }
+
+          /* Force single row stats */
+          #certificate .grid {
+            gap: 4px !important;
+          }
+
+          /* Reduce main content padding */
+          #certificate > div:last-child {
+            padding: 14mm !important;
+          }
+
+          /* Fixed image sizes */
+          #certificate img[alt="Verify QR Code"] {
+            width: 56px !important;
+            height: 56px !important;
+          }
+
+          #certificate img[alt="NihongoBD"] {
+            width: 36px !important;
+            height: 36px !important;
+          }
+
+          #certificate img[alt="Founder Signature"] {
+            width: 90px !important;
+            height: 36px !important;
           }
         }
       `}</style>
@@ -440,16 +509,16 @@ function PremiumStatBox({
 }) {
   return (
     <div
-      className="rounded-xl p-3 text-center border"
+      className="rounded-xl p-2.5 text-center border"
       style={{
         background: "linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)",
         borderColor: `${accent}20`,
       }}
     >
-      <p className="text-[10px] text-text-secondary font-bangla uppercase tracking-wider mb-1">
+      <p className="text-[10px] text-text-secondary font-bangla uppercase tracking-wider mb-0.5">
         {label}
       </p>
-      <p className="text-lg font-bold" style={{ color: accent }}>
+      <p className="text-base font-bold" style={{ color: accent }}>
         {value}
         {total && (
           <span className="text-xs text-text-secondary/70">/{total}</span>
