@@ -9,9 +9,11 @@ import { LevelSwitcher } from "./LevelSwitcher";
 import { GlobalSearch } from "./GlobalSearch";
 import { InstallButton } from "@/components/pwa/InstallButton";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/data";
 
-const navLinks = [
+// Level-specific nav links
+const levelLinks = [
   { section: "vocabulary", label: "ভোকাব" },
   { section: "grammar", label: "গ্রামার" },
   { section: "kanji", label: "কাঞ্জি" },
@@ -23,10 +25,21 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Current level detect করো URL থেকে
+  // Current level detect
   const pathParts = pathname?.split("/").filter(Boolean) || [];
-  const currentLevel: Level =
-    pathParts[0] === "n4" ? "n4" : "n5"; // default n5
+  const currentLevel: Level = pathParts[0] === "n4" ? "n4" : "n5";
+
+  // Active state check
+  const isKanaActive = (path: string) =>
+    pathname === path || pathname?.startsWith(`${path}/`);
+
+  const isLevelActive = (section: string) =>
+    pathname?.startsWith(`/${currentLevel}/${section}`);
+
+  // Nav link base classes
+  const navBase =
+    "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors font-bangla";
+  const navInactive = "text-text-secondary hover:text-jp-red hover:bg-bg-alt";
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-border">
@@ -38,18 +51,52 @@ export function Header() {
             <LevelSwitcher />
           </div>
 
-          {/* Desktop Search (center) */}
-          <div className="hidden lg:flex flex-1 justify-center max-w-md">
+          {/* Desktop Search */}
+          <div className="hidden xl:flex flex-1 justify-center max-w-md">
             <GlobalSearch />
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1 shrink-0">
-            {navLinks.map((link) => (
+          <nav className="hidden xl:flex items-center gap-1 shrink-0">
+            {/* Hiragana */}
+            <Link
+              href="/hiragana"
+              className={cn(
+                navBase,
+                isKanaActive("/hiragana")
+                  ? "bg-jp-red text-white"
+                  : navInactive
+              )}
+            >
+              হিরাগানা
+            </Link>
+
+            {/* Katakana */}
+            <Link
+              href="/katakana"
+              className={cn(
+                navBase,
+                isKanaActive("/katakana")
+                  ? "bg-jp-red text-white"
+                  : navInactive
+              )}
+            >
+              কাতাকানা
+            </Link>
+
+            {/* Level-specific links */}
+            {levelLinks.map((link) => (
               <Link
                 key={link.section}
                 href={`/${currentLevel}/${link.section}`}
-                className="px-2.5 py-2 text-sm font-medium text-text-secondary hover:text-jp-red hover:bg-bg-alt rounded-lg transition-colors font-bangla"
+                className={cn(
+                  navBase,
+                  isLevelActive(link.section)
+                    ? currentLevel === "n5"
+                      ? "bg-jp-red text-white"
+                      : "bg-bd-green text-white"
+                    : navInactive
+                )}
               >
                 {link.label}
               </Link>
@@ -58,7 +105,7 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="lg:hidden">
+            <div className="xl:hidden">
               <GlobalSearch />
             </div>
 
@@ -67,7 +114,7 @@ export function Header() {
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden w-11 h-11 flex items-center justify-center rounded-lg hover:bg-bg-alt"
+              className="xl:hidden w-11 h-11 flex items-center justify-center rounded-lg hover:bg-bg-alt"
               aria-label="Menu"
             >
               <span className="text-2xl">{isOpen ? "✕" : "☰"}</span>
@@ -77,17 +124,54 @@ export function Header() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <nav className="lg:hidden py-4 border-t border-border flex flex-col gap-1">
-            {navLinks.map((link) => (
+          <nav className="xl:hidden py-4 border-t border-border flex flex-col gap-1">
+            {/* Hiragana */}
+            <Link
+              href="/hiragana"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "px-3 py-2 text-base font-medium rounded-lg font-bangla",
+                isKanaActive("/hiragana")
+                  ? "bg-jp-red text-white"
+                  : "text-text-primary hover:text-jp-red hover:bg-bg-alt"
+              )}
+            >
+              হিরাগানা
+            </Link>
+
+            {/* Katakana */}
+            <Link
+              href="/katakana"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "px-3 py-2 text-base font-medium rounded-lg font-bangla",
+                isKanaActive("/katakana")
+                  ? "bg-jp-red text-white"
+                  : "text-text-primary hover:text-jp-red hover:bg-bg-alt"
+              )}
+            >
+              কাতাকানা
+            </Link>
+
+            {/* Level-specific */}
+            {levelLinks.map((link) => (
               <Link
                 key={link.section}
                 href={`/${currentLevel}/${link.section}`}
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-3 text-base font-medium text-text-primary hover:text-jp-red hover:bg-bg-alt rounded-lg font-bangla"
+                className={cn(
+                  "px-3 py-2 text-base font-medium rounded-lg font-bangla",
+                  isLevelActive(link.section)
+                    ? currentLevel === "n5"
+                      ? "bg-jp-red text-white"
+                      : "bg-bd-green text-white"
+                    : "text-text-primary hover:text-jp-red hover:bg-bg-alt"
+                )}
               >
                 {link.label}
               </Link>
             ))}
+
             <Link
               href="/signin"
               onClick={() => setIsOpen(false)}
