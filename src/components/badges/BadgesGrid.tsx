@@ -1,12 +1,35 @@
 "use client";
 
+import { useState } from "react";
 import { useProgress } from "@/hooks/useProgress";
 import { BadgeCard } from "./BadgeCard";
 import { BADGES, getEarnedBadges } from "@/lib/badges";
 import { Container } from "@/components/layout/Container";
+import { cn } from "@/lib/utils";
+import type { Level } from "@/lib/data";
+
+const LEVEL_BADGES: Record<string, string[]> = {
+  n5: [
+    "hiragana-first", "hiragana-master", "katakana-master",
+    "vocab-50", "vocab-200", "vocab-500", "vocab-800",
+    "grammar-10", "grammar-50",
+    "kanji-25", "kanji-100",
+    "streak-3", "streak-7", "streak-30",
+    "quiz-first", "quiz-10", "quiz-perfect",
+    "n5-complete",
+  ],
+  n4: [
+    "n4-vocab-100", "n4-vocab-500", "n4-vocab-1000",
+    "n4-grammar-20", "n4-grammar-80",
+    "n4-kanji-50", "n4-kanji-300",
+    "n4-complete",
+  ],
+  general: ["streak-3", "streak-7", "streak-30", "quiz-first", "quiz-10", "quiz-perfect"],
+};
 
 export function BadgesGrid() {
   const { progress, loading } = useProgress();
+  const [activeLevel, setActiveLevel] = useState<"n5" | "n4">("n5");
 
   if (loading || !progress) {
     return (
@@ -18,15 +41,24 @@ export function BadgesGrid() {
     );
   }
 
-  const earned = getEarnedBadges(progress);
-  const earnedIds = new Set(earned.map((b) => b.id));
-  const total = BADGES.length;
-  const earnedCount = earned.length;
-  const percent = Math.round((earnedCount / total) * 100);
+  const earnedIds = new Set(getEarnedBadges(progress).map((b) => b.id));
+
+  // Filter badges by active level
+  const levelBadgeIds = LEVEL_BADGES[activeLevel] || [];
+  const displayBadges = BADGES.filter((b) => levelBadgeIds.includes(b.id));
+
+  const earnedCount = displayBadges.filter((b) => earnedIds.has(b.id)).length;
+  const total = displayBadges.length;
+  const percent = total > 0 ? Math.round((earnedCount / total) * 100) : 0;
+
+  const isN5 = activeLevel === "n5";
+  const accentColor = isN5 ? "#BC002D" : "#006A4E";
+  const accentColor2 = isN5 ? "#8E0021" : "#004A36";
 
   return (
     <div className="py-10">
       <Container>
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
             🏆 ব্যাজ
@@ -36,15 +68,47 @@ export function BadgesGrid() {
           </p>
         </div>
 
+        {/* Level Tabs */}
+        <div className="inline-flex rounded-xl border border-border bg-white p-1 mb-6">
+          <button
+            onClick={() => setActiveLevel("n5")}
+            className={cn(
+              "px-5 py-2 rounded-lg text-sm font-bold transition-colors font-en",
+              isN5
+                ? "bg-jp-red text-white"
+                : "text-text-secondary hover:bg-bg-alt"
+            )}
+          >
+            N5
+          </button>
+          <button
+            onClick={() => setActiveLevel("n4")}
+            className={cn(
+              "px-5 py-2 rounded-lg text-sm font-bold transition-colors font-en",
+              !isN5
+                ? "bg-bd-green text-white"
+                : "text-text-secondary hover:bg-bg-alt"
+            )}
+          >
+            N4
+          </button>
+        </div>
+
         {/* Summary */}
-        <div className="bg-gradient-to-br from-jp-red to-jp-red/80 rounded-2xl p-6 text-white shadow-card mb-8">
+        <div
+          className="rounded-2xl p-6 text-white shadow-card mb-8"
+          style={{
+            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor2} 100%)`,
+          }}
+        >
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm opacity-90 font-bangla mb-1">
-                তুমি অর্জন করেছ
+                {activeLevel.toUpperCase()} — তুমি অর্জন করেছ
               </p>
               <p className="text-3xl font-bold">
-                {earnedCount} <span className="text-xl opacity-80">/ {total}</span>
+                {earnedCount}{" "}
+                <span className="text-xl opacity-80">/ {total}</span>
               </p>
               <p className="text-xs opacity-80 font-bangla mt-1">
                 ব্যাজ ({percent}%)
@@ -65,7 +129,7 @@ export function BadgesGrid() {
 
         {/* Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {BADGES.map((badge) => {
+          {displayBadges.map((badge) => {
             const isEarned = earnedIds.has(badge.id);
             const progressData = badge.progress(progress);
 
