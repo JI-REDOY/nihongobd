@@ -5,17 +5,16 @@ import { useState } from "react";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
 import { LevelSwitcher } from "./LevelSwitcher";
+import { GlobalSearch } from "./GlobalSearch";
 import { InstallButton } from "@/components/pwa/InstallButton";
 import { UserMenu } from "@/components/auth/UserMenu";
 
 const navLinks = [
   { href: "/hiragana", label: "হিরাগানা" },
   { href: "/katakana", label: "কাতাকানা" },
-  { href: "/n5/vocabulary", label: "ভোকাব" },
-  { href: "/n5/grammar", label: "গ্রামার" },
-  { href: "/n5/kanji", label: "কাঞ্জি" },
-  { href: "/n5/quiz", label: "কুইজ" },
-  { href: "/n5/speaking", label: "স্পিকিং" },
+  { href: "/vocabulary", label: "ভোকাব" },
+  { href: "/grammar", label: "গ্রামার" },
+  { href: "/kanji", label: "কাঞ্জি" },
 ];
 
 export function Header() {
@@ -24,20 +23,25 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-border">
       <Container>
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between h-16 gap-3">
+          {/* Logo + Level Switcher */}
+          <div className="flex items-center gap-3 shrink-0">
             <Logo />
             <LevelSwitcher />
           </div>
 
+          {/* Desktop Search (center) */}
+          <div className="hidden lg:flex flex-1 justify-center max-w-md">
+            <GlobalSearch />
+          </div>
+
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.slice(0, 5).map((link) => (
+          <nav className="hidden lg:flex items-center gap-1 shrink-0">
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm font-medium text-text-secondary hover:text-jp-red hover:bg-bg-alt rounded-lg transition-colors font-bangla"
+                className="px-2.5 py-2 text-sm font-medium text-text-secondary hover:text-jp-red hover:bg-bg-alt rounded-lg transition-colors font-bangla"
               >
                 {link.label}
               </Link>
@@ -45,7 +49,12 @@ export function Header() {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Mobile search trigger */}
+            <div className="lg:hidden">
+              <GlobalSearch />
+            </div>
+
             <InstallButton />
             <UserMenu />
 
