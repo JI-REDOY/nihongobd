@@ -5,14 +5,26 @@ import { ALL_LEVELS, type Level } from "@/lib/data";
 
 interface PageProps {
   params: Promise<{ level: string }>;
+  searchParams: Promise<{ q?: string }>;
 }
 
-export default async function KanjiPage({ params }: PageProps) {
+export const dynamic = "force-dynamic";
+
+export default async function KanjiPage({ params, searchParams }: PageProps) {
   const { level } = await params;
+  const { q } = await searchParams;
+
   if (!ALL_LEVELS.includes(level as Level)) notFound();
 
   const session = await getSession();
   if (!session) redirect(`/signin?callbackUrl=/${level}/kanji`);
 
-  return <KanjiGrid level={level as Level} />;
+  // ⭐ key দিয়ে force re-render
+  return (
+    <KanjiGrid
+      key={`${level}-${q || "all"}`}
+      level={level as Level}
+      initialSearch={q || ""}
+    />
+  );
 }

@@ -16,13 +16,14 @@ const ITEMS_PER_PAGE = 30;
 
 interface VocabListProps {
   level: Level;
+  initialSearch?: string;
 }
 
-export function VocabList({ level }: VocabListProps) {
+export function VocabList({ level, initialSearch = "" }: VocabListProps) {
   const { progress, loading, toggleVocab } = useProgress();
   const [view, setView] = useState<ViewMode>("list");
   const [filter, setFilter] = useState<FilterMode>("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [flashIndex, setFlashIndex] = useState(0);
   const [page, setPage] = useState(1);
 
@@ -105,7 +106,6 @@ export function VocabList({ level }: VocabListProps) {
   return (
     <div className="py-10">
       <Container>
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
             {level.toUpperCase()} ভোকাবুলারি
@@ -115,7 +115,6 @@ export function VocabList({ level }: VocabListProps) {
           </p>
         </div>
 
-        {/* Progress */}
         <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
@@ -158,7 +157,6 @@ export function VocabList({ level }: VocabListProps) {
           </div>
         </div>
 
-        {/* Controls */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <div className="inline-flex rounded-xl border border-border bg-white p-1">
             <button
@@ -218,7 +216,6 @@ export function VocabList({ level }: VocabListProps) {
           </span>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -249,7 +246,6 @@ export function VocabList({ level }: VocabListProps) {
                 ))}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <p className="text-sm text-text-secondary font-bangla">
@@ -317,7 +313,6 @@ export function VocabList({ level }: VocabListProps) {
   );
 }
 
-// ===== Pagination Numbers =====
 function PageNumbers({
   currentPage,
   totalPages,

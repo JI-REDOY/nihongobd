@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { SearchResult } from "@/app/api/search/route";
 
@@ -24,7 +23,6 @@ export function GlobalSearch() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   // Keyboard shortcut: Cmd/Ctrl + K
   useEffect(() => {
@@ -39,13 +37,14 @@ export function GlobalSearch() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
-  // Auto focus
+  // Auto focus + reset
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
       setQuery("");
       setResults([]);
+      setLoading(false);
     }
   }, [open]);
 
@@ -72,16 +71,12 @@ export function GlobalSearch() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  function handleResultClick() {
-    setOpen(false);
-  }
-
   return (
     <>
-      {/* Search trigger button */}
+      {/* Search trigger button (desktop) */}
       <button
         onClick={() => setOpen(true)}
-        className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-bg-alt hover:border-jp-red/40 transition-colors text-sm text-text-secondary min-w-[180px]"
+        className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-bg-alt hover:border-jp-red/40 transition-colors text-sm text-text-secondary w-full max-w-xs"
         aria-label="Search"
       >
         <span>🔍</span>
@@ -157,7 +152,7 @@ export function GlobalSearch() {
                     <Link
                       key={`${result.type}-${result.level}-${result.id}`}
                       href={result.href}
-                      onClick={handleResultClick}
+                      onClick={() => setOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-bg-alt transition-colors"
                     >
                       <div
@@ -196,9 +191,9 @@ export function GlobalSearch() {
                 <span>{results.length}টি ফলাফল</span>
                 <span className="font-en">
                   <kbd className="px-1 rounded border border-border bg-white">
-                    ↑↓
+                    ESC
                   </kbd>{" "}
-                  navigate
+                  close
                 </span>
               </div>
             )}

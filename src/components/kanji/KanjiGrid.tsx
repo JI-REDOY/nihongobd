@@ -14,13 +14,14 @@ const ITEMS_PER_PAGE = 40;
 
 interface KanjiGridProps {
   level: Level;
+  initialSearch?: string;
 }
 
-export function KanjiGrid({ level }: KanjiGridProps) {
+export function KanjiGrid({ level, initialSearch = "" }: KanjiGridProps) {
   const { progress, loading, toggleKanji } = useProgress();
   const [selected, setSelected] = useState<KanjiItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("সব");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [page, setPage] = useState(1);
 
   const data = getLevelData(level).kanji;
@@ -93,7 +94,6 @@ export function KanjiGrid({ level }: KanjiGridProps) {
   return (
     <div className="py-10">
       <Container>
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-bangla">
             {level.toUpperCase()} কাঞ্জি
@@ -103,7 +103,6 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           </p>
         </div>
 
-        {/* Progress */}
         <div className="bg-white rounded-xl border border-border shadow-soft p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-text-primary font-bangla">
@@ -175,7 +174,6 @@ export function KanjiGrid({ level }: KanjiGridProps) {
           ))}
         </div>
 
-        {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
             {Array.from({ length: 24 }).map((_, i) => (
@@ -207,7 +205,6 @@ export function KanjiGrid({ level }: KanjiGridProps) {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-text-secondary font-bangla">
@@ -269,7 +266,6 @@ export function KanjiGrid({ level }: KanjiGridProps) {
   );
 }
 
-// ===== Pagination Numbers =====
 function PageNumbers({
   currentPage,
   totalPages,

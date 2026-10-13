@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
           id: v.id,
           title: v.japanese,
           subtitle: `${v.romaji} · ${v.bangla}`,
-          href: `/${level}/vocabulary`,
+          href: `/${level}/vocabulary?q=${encodeURIComponent(v.japanese)}`,
           icon: "語",
         });
         if (results.length >= 30) break;
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
           id: k.id,
           title: k.kanji,
           subtitle: `${k.meaning} · ${k.onReading}`,
-          href: `/${level}/kanji`,
+          href: `/${level}/kanji?q=${encodeURIComponent(k.kanji)}`,
           icon: "漢",
         });
         if (results.length >= 30) break;
