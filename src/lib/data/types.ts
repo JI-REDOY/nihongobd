@@ -47,3 +47,26 @@ export type LevelConfig = {
   totalKanji: number;
   color: "jp-red" | "bd-green";
 };
+
+// ===== Memory Method Types =====
+export type MemoryKanji = {
+  kanji: string;
+  reading: string;
+  meaning: string;
+  meaningEn: string;
+  components: string[];
+  mnemonic: string;
+};
+
+export type MemoryRadical = {
+  id: string;
+  radical: string;
+  radicalName: string;
+  radicalNameBangla: string;
+  meaning: string;
+  strokeCount: number;
+  category: string;
+  intro: string;
+  mnemonicTip: string;
+  kanjiFamily: MemoryKanji[];
+};

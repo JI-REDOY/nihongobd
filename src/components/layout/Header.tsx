@@ -12,11 +12,11 @@ import { UserMenu } from "@/components/auth/UserMenu";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/data";
 
-// Level-specific nav links
 const levelLinks = [
   { section: "vocabulary", label: "ভোকাব" },
   { section: "grammar", label: "গ্রামার" },
   { section: "kanji", label: "কাঞ্জি" },
+  { section: "memory", label: "নিঞ্জা টেকনিক", premium: true },
   { section: "quiz", label: "কুইজ" },
   { section: "speaking", label: "স্পিকিং" },
 ];
@@ -25,18 +25,15 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Current level detect
   const pathParts = pathname?.split("/").filter(Boolean) || [];
   const currentLevel: Level = pathParts[0] === "n4" ? "n4" : "n5";
 
-  // Active state check
   const isKanaActive = (path: string) =>
     pathname === path || pathname?.startsWith(`${path}/`);
 
   const isLevelActive = (section: string) =>
     pathname?.startsWith(`/${currentLevel}/${section}`);
 
-  // Nav link base classes
   const navBase =
     "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors font-bangla";
   const navInactive = "text-text-secondary hover:text-jp-red hover:bg-bg-alt";
@@ -45,20 +42,16 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-border">
       <Container>
         <div className="flex items-center justify-between h-16 gap-3">
-          {/* Logo + Level Switcher */}
           <div className="flex items-center gap-3 shrink-0">
             <Logo />
             <LevelSwitcher />
           </div>
 
-          {/* Desktop Search */}
           <div className="hidden xl:flex flex-1 justify-center max-w-md">
             <GlobalSearch />
           </div>
 
-          {/* Desktop Nav */}
           <nav className="hidden xl:flex items-center gap-1 shrink-0">
-            {/* Hiragana */}
             <Link
               href="/hiragana"
               className={cn(
@@ -70,8 +63,6 @@ export function Header() {
             >
               হিরাগানা
             </Link>
-
-            {/* Katakana */}
             <Link
               href="/katakana"
               className={cn(
@@ -84,7 +75,6 @@ export function Header() {
               কাতাকানা
             </Link>
 
-            {/* Level-specific links */}
             {levelLinks.map((link) => (
               <Link
                 key={link.section}
@@ -103,7 +93,6 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Right side */}
           <div className="flex items-center gap-2 shrink-0">
             <div className="xl:hidden">
               <GlobalSearch />
@@ -122,10 +111,8 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isOpen && (
           <nav className="xl:hidden py-4 border-t border-border flex flex-col gap-1">
-            {/* Hiragana */}
             <Link
               href="/hiragana"
               onClick={() => setIsOpen(false)}
@@ -138,8 +125,6 @@ export function Header() {
             >
               হিরাগানা
             </Link>
-
-            {/* Katakana */}
             <Link
               href="/katakana"
               onClick={() => setIsOpen(false)}
@@ -153,7 +138,6 @@ export function Header() {
               কাতাকানা
             </Link>
 
-            {/* Level-specific */}
             {levelLinks.map((link) => (
               <Link
                 key={link.section}
