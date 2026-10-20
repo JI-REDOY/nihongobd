@@ -1,34 +1,58 @@
-# 🎌 NihongoBD — জাপানিজ শেখা সহজ
+# 🇯🇵 NihongoBD — বাংলায় জাপানিজ শেখার প্ল্যাটফর্ম
 
-বাংলাদেশি শিক্ষার্থীদের জন্য জাপানিজ ভাষা শেখার সম্পূর্ণ প্ল্যাটফর্ম। **শূন্য থেকে N5** পর্যন্ত — সম্পূর্ণ বাংলায়।
+> বাংলাদেশি শিক্ষার্থীদের জন্য সম্পূর্ণ বাংলায় জাপানিজ ভাষা শেখার ফ্রি প্ল্যাটফর্ম। শূন্য থেকে N5 এবং N4 পর্যন্ত — সবকিছু এক জায়গায়।
 
-🌐 **Live:** [https://nihongobd.vercel.app](https://nihongobd.vercel.app)
+🌐 **Live Demo:** [https://nihongobd.vercel.app](https://nihongobd.vercel.app)
+📦 **GitHub:** [https://github.com/JI-REDOY/nihongobd](https://github.com/JI-REDOY/nihongobd)
 
 ---
 
 ## ✨ Features
 
-### 📚 Core Learning
-- **হিরাগানা** (৪৬টি অক্ষর) — Grid view + Modal + Audio + Progress
-- **কাতাকানা** (৪৬টি অক্ষর) — Same structure
-- **N5 Vocabulary** (২০০টি শব্দ) — Flashcard + List + Filter
-- **N5 Grammar** (১৫টি lesson) — Pattern + Explanation + Examples
+### 📚 Complete N5 + N4 Content
+- **হিরাগানা** (৪৬টি অক্ষর) + **কাতাকানা** (৪৬টি অক্ষর)
+- **১৮০০+ Vocabulary** (N5: ৮০০, N4: ১০০০)
+- **১৩০ Grammar Lessons** (N5: ৫০, N4: ৮০)
+- **৪০০+ Kanji** (N5: ১০০, N4: ৩০০)
+- **Reading Passages** (২০+)
 
-### 🎯 Practice
-- **Quiz System** — Vocab / Hiragana / Katakana (10 questions, 4 options)
-- **Progress Tracking** — Real-time save to MongoDB
-- **Streak System** — Daily learning streak
+### 🥷 Ninja Technique (Premium Method)
+- **Radical-based Kanji Learning** — এক radical শিখলে ১৫+ kanji একসাথে
+- Mnemonic stories বাংলায়
+- Visual component breakdown
+- ৮টা radical → ১১৫+ kanji family
 
-### 👤 User
-- Email / Google / GitHub authentication
-- Profile with image upload (GridFS)
-- Progress dashboard
+### 🎯 Practice Features
+- **Quiz System** — ৫ type: Vocab, Hiragana, Katakana, Listening, Reading
+- **Speaking Practice** — Web Speech API দিয়ে pronunciation check
+- **Real-time Progress Tracking** — MongoDB এ save
+
+### 🎓 Certificate System
+- **QR-Verified Certificate** — scan করলে online valid/invalid দেখাবে
+- **Founder Signature** সহ premium design
+- N5 + N4 both levels
+- Print/PDF download ready
+
+### 🏆 Gamification
+- **Badges System** — ২৬টা achievement
+- **Streak Tracking** — daily learning streak
+- **Course Duration** — ৩০/৬০/৯০/১৮০ দিনের প্ল্যান
 
 ### 📱 PWA
-- Installable on mobile + desktop
-- Offline support
-- Standalone mode
-- Home screen icon
+- **Installable** — মোবাইল + desktop home screen এ
+- **Offline Support** — Service Worker
+- **Standalone Mode** — native app feel
+- Custom install button
+
+### 🔍 Global Search
+- **Cmd/Ctrl + K** shortcut
+- Vocab + Grammar + Kanji একসাথে search
+- Level-specific filter
+
+### 👤 User System
+- **Auth:** Email/Password + Google + GitHub (BetterAuth)
+- **Profile:** নাম + ছবি update (GridFS)
+- **Multi-level Dashboard** — N5/N4 switch
 
 ---
 
@@ -36,61 +60,36 @@
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| Auth | BetterAuth (Email + Google + GitHub) |
-| Database | MongoDB Atlas + GridFS |
-| Audio | Web Speech API (ja-JP) |
-| PWA | Service Worker + Manifest |
-| Deploy | Vercel |
+| **Framework** | Next.js 16 (App Router, Turbopack) |
+| **Language** | TypeScript |
+| **Styling** | Tailwind CSS v4 |
+| **Auth** | BetterAuth (Email + Google + GitHub) |
+| **Database** | MongoDB Atlas |
+| **File Storage** | GridFS (images) |
+| **Audio** | Web Speech API (ja-JP) |
+| **QR Code** | qrcode npm package |
+| **PWA** | Service Worker + Manifest |
+| **Deploy** | Vercel |
 
 ---
 
----
+## 🚀 Getting Started
 
-## 📊 Current Status (Phase 1 Complete)
+### Prerequisites
+- Node.js 20+
+- MongoDB Atlas account
+- Google OAuth credentials
+- GitHub OAuth credentials
 
-### ✅ Completed Features
-- Landing page + Trial preview
-- Sign up / Sign in (Email + Google + GitHub)
-- Onboarding (duration select — 30/60/90/180 days)
-- হিরাগানা (46) — grid + modal + audio + progress
-- কাতাকানা (46) — same structure
-- N5 Vocabulary (200) — flashcard + list + filter
-- N5 Grammar (15) — list + detail + mark complete
-- N5 Kanji (100) — grid + category filter + modal + readings
-- Quiz — 5 types (vocab, hiragana, katakana, listening, reading)
-- Speaking Practice (Web Speech API pronunciation check)
-- Dashboard — hero + progress tiles + streak + course countdown
-- Profile + Edit + Image upload (GridFS)
-- Certificate system (80% eligibility + print)
-- Toast notifications + Loading + 404
-- PWA (installable + offline + custom install button)
-- MongoDB Atlas + GridFS image storage
-- Vercel deployed: https://nihongobd.vercel.app
+### Installation
 
-### 🚧 Next Phase Options
-- N5 polish (search, quiz history, dark mode, password reset)
-- N4 content (kanji + vocab + grammar + mock test)
-- Marketing + analytics
-- Payment (Stripe) + AI assistant
+```bash
+# Clone repository
+git clone https://github.com/JI-REDOY/nihongobd.git
+cd nihongobd
 
-### 🛠️ Tech Stack
-Next.js 16 · TypeScript · Tailwind CSS v4 · BetterAuth · 
-MongoDB Atlas · GridFS · Web Speech API · PWA · Vercel
+# Install dependencies
+npm install
 
-### 📁 Key Files
-- `src/lib/` — auth, mongodb, gridfs, progress, n5Vocab, n5Grammar, n5Kanji, kanaData, certificate, onboarding, quizGenerator, advancedQuiz
-- `src/app/(main)/` — protected routes (hiragana, katakana, n5/*, dashboard, profile, certificate, onboarding)
-- `src/components/` — layout, ui, kana, vocab, grammar, kanji, quiz, profile, dashboard, auth, pwa, onboarding, certificate, speaking
-- `src/hooks/` — useProgress, usePWAInstall, useServiceWorker
-
----
-
-## 📝 Last Session Summary
-
-**Date:** 2026-10-12  
-**Completed:** Full N5 MVP with Kanji page + Onboarding + Certificate  
-**Deployed:** https://nihongobd.vercel.app  
-**Status:** Phase 1 Complete, ready for user feedback
+# Setup environment
+cp .env.example .env.local
